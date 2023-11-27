@@ -50,3 +50,115 @@
 | 46  | AbnormalExtFormActionR       | Categorical | Check if the form action attribute contains a foreign domain, “about:blank” or an empty string. Apply rules to generate value.                         |
 | 47  | ExtMetaScriptLinkRT          | Categorical | Counts percentage of meta, script and link tags containing external URL in the attributes. Apply rules and thresholds to generate value.               |
 | 48  | PctExtNullSelfRedirectHyperlinksRT| Categorical | Counts the percentage of hyperlinks in HTML source code that uses different domain names, starts with “#”, or using “JavaScript ::void(0)”. Apply rules and thresholds to generate value. |
+
+# Feature Explaination
+## SubdomainLevel
+Level of subdomains in URL.
+E.g.: https://**subdomain1**.**subdomain2**.domain.de -> 2
+
+## UrlLength
+Total characters of in URL.
+E.g.: https://subdomain1.subdomain2.domain.de -> 39
+
+## NumDashInHostname
+Number of dashes (-) in hostname.
+The hostname is everything between the protocol and the first / appearing after the top-level domain.
+E.g.: https://**subdomain-1.subdomain-2.domain-0.de**/path-to-image ->  3
+
+## TildeSymbol
+If a tile symbol exists in URL.
+E.g.: https://subdomain1.subdomain2.**~**domain.de
+-> true
+
+## NumPercent
+Number of percent symbols (%) in URL.
+E.g.: https://subdomain1.subdomain2%.domain%.de -> 2
+
+
+## NumAmpersand
+Number of ampersands (&) in URL.
+E.g.: https://subdomain1.subdomain2.domain.de?var1=0**&**var2=1**&**var3=2 -> 2
+
+## NumNumericChars
+Number of numbers in URL.
+E.g.: https://subdomain**1**.subdomain**2**.domain.de -> 2
+
+## RandomString
+If a random string is in URL.
+A random string is ???
+-> No source available (paper access restricted)
+
+## DomainInSubdomains
+If top-level-domain or country-code top-level-domain is part of a subdomain in URL.
+See: https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains, https://en.wikipedia.org/wiki/Country_code_top-level_domain#Lists
+
+E.g.: https://subdomain1de.subdomain2name.domain.de -> true
+
+## HttpsInHostname
+If https in in hostname(?).
+E.g.: https://https-subdomain1.subdomain2.domain.de -> true
+
+## PathLength
+Number of characters in paht in URL.
+The path is between the hostname and a file: \<protocol>://\<host>/\<path>/\<file>?\<query>
+E.g.: https://subdomain1.subdomain2.domain.de/path-to-subfolder/path-to-file/file.fl -> 30
+
+## DoubleSlashInPath
+If double slashes are in path in URL.
+E.g.: https://subdomain1.subdomain2.domain.de/path//to/somwhere -> true
+
+## EmbeddedBrandName
+If brand name is in subdomains and paths in URL.
+The brand name is the most frequent domain keyword in the HTML links of the html content.
+E.g.: https://**subdomain1**.**subdomain2-brandname**.domain.de/**brandname/path/to/somwhere** -> true (2)
+
+## PctExtResourceUrls
+Percentage of external resource URLs of all URLS in html content.
+An external resource URL is an URL that does point to a foreign domain.
+E.g.: https://subdomain1.subdomain2.domain.de
+- href="https://paypal.com/" -> external
+- href="https://google.de/" -> external
+- href="https://domain.de/path" -> internal
+-> 2/3
+
+## InsecureForms
+If a form action attribute contains URL without https.
+E.g.: \<form action="http://domain.de">...\</form> -> true
+
+## ExtFormAction
+If a form action attribute contains external URL.
+E.g.: \<form action="https://evil.de">...\</form> -> true
+
+## PctNullSelfRedirectHyperlinks
+Percentage of hyperlinks containing empty values, self-redirect values, URL of current webpage or abnormal value(???) in html content.
+Empty value: ""
+Self-redirect values: "#", javascript::void(0)
+Abnormal value: "file://E:/"
+
+## FakeLinkInStatusBar
+If html content contains JavScript command onMouseOver to display fake URL in status bar.
+The status bar is displayed on the left/right lower corner of the browser to indicate the destination of a link or resource.
+If onmouseover change the status bar -> Consider it a fake manipulation.
+
+## PopUpWindow
+If html content contains JavaScript command to launch pop-ups.
+Command to launch pop-ups: window.open("...")
+
+## IframeOrFrame
+If frame or iframe are used in html content.
+\<iframe ...>\</iframe>
+\<frame>...
+
+## ImagesOnlyInForm
+If forms in html content does not contain any text and instead only images.
+\<form ...>\<img/>\</form>
+
+## UrlLengthRT
+Number of characters in the whole URL.
+E.g.: https://subdomain1.subdomain2.domain.de/path-to-subfolder/path-to-file/file.fl -> 78 
+
+## AbnormalExtFormActionR
+If form action contains foreign domain, "about:blank" or empty string.
+
+## PctExtNullSelfRedirectHyperlinksRT
+Percentage of hyperlinks in html content that uses differen domain names, start with ' or usess JavaScript ::void(0).
