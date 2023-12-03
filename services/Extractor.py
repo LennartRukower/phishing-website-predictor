@@ -1,3 +1,6 @@
+from urllib.parse import urlparse
+import re
+
 class Extractor():
     '''Provides functions to extract features from a URL and its HTML code'''
 
@@ -36,7 +39,14 @@ class Extractor():
     
     def get_path(self, url):
         '''Returns the path (characters between hostnamen and a file: <protocol>://<host>/<path>/<file>?<query>) of the given URL'''
-        return url.split("://")[1].split("/")[1].split("?")[0]
+        url_path = urlparse(url).path
+        url_path = url_path[1:] # Remove first slash
+        file_pattern = r'/[^/]+\.[^/]+$'
+        if re.search(file_pattern, url_path):
+            return re.sub(file_pattern, '', url_path)
+        else:
+            return url_path
+        
 
     def get_hostname(self, url):
         '''Returns the hostname of the given URL'''
@@ -122,6 +132,32 @@ assert ex.get_domain(test_url) == "google"
 print("Helper functions work as expected")
 
 # Test the extraction functions
+assert ex.extract_subdomain_level(test_url) == 1
+assert ex.extract_url_length(test_url) == 102
+assert ex.extract_num_dash_in_hostname(test_url) == 0
+assert ex.extract_tilde_symbol(test_url) == False
+assert ex.extract_num_percent(test_url) == 0
+assert ex.extract_num_ampersand(test_url) == 4
+assert ex.extract_num_numeric_chars(test_url) == 13
+assert ex.extract_https_in_hostname(test_url) == False
+assert ex.extract_path_length(test_url) == 6
+assert ex.extract_double_slash_in_path(test_url) == False
+
+# Insecure and posibble phishing test url
+test_url = "http://https.secure-url.googel.com/search//value?~q=hello&oq=hello&aqs=chrome..69i57j0l7.1002j0j7&sourceid=chrome&ie=UTF-8%"
+assert ex.extract_subdomain_level(test_url) == 2
+assert ex.extract_url_length(test_url) == 123
+assert ex.extract_num_dash_in_hostname(test_url) == 1
+assert ex.extract_tilde_symbol(test_url) == True
+assert ex.extract_num_percent(test_url) == 1
+assert ex.extract_num_ampersand(test_url) == 4
+assert ex.extract_num_numeric_chars(test_url) == 13
+assert ex.extract_https_in_hostname(test_url) == True
+assert ex.extract_path_length(test_url) == 13
+assert ex.extract_double_slash_in_path(test_url) == True
+
+print("Extraction functions work as expected")
+
 test_html_code = """
 <html>
     <head>
