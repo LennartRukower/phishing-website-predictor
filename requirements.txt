@@ -1,2 +1,5 @@
 flask
-urllib.parse
+torch
+numpy
+pandas
+scikit-learn
