@@ -1,4 +1,6 @@
 from urllib.parse import urlparse
+from bs4 import BeautifulSoup
+import tldextract
 import re
 
 class Extractor():
@@ -12,23 +14,23 @@ class Extractor():
 
         # TODO: Call the different extraction functions
         features_dict = {
-            "subdomain_level": 0,
-            "url_length": 0,
-            "num_dash_in_hostname": 0,
-            "tilde_symbol": False,
-            "num_percent": 0,
-            "num_ampersand": 0,
-            "num_numeric_chars": 0,
-            "domain_in_subdomains": False,
-            "https_in_hostname": False,
-            "path_length": 0,
-            "double_slash_in_path": False,
-            "pct_ext_resource_urls": 0.0,
-            "insecure_forms": False,
-            "ext_form_action": False,
-            "popup_window": False,
-            "iframe_or_frame": False,
-            "images_only_in_forms": False,
+            "SubdomainLevel": 0,
+            "UrlLength": 0,
+            "NumDashInHostname": 0,
+            "TildeSymbol": False,
+            "NumPercent" : 0,
+            "NumAmpersand" : 0,
+            "NumNumericChars" : 0,
+            "DomainInSubdomains" : False,
+            "HttpsInHostname" : False,
+            "PathLength" : 0,
+            "DoubleSlashInPath" : False,
+            "PctExtResourceUrls" : 0.0,
+            "InsecureForms" : False,
+            "ExtFormAction" : False,
+            "PopUpWindow" : False,
+            "IframeOrFrame" : False,
+            "ImagesOnlyInForm" : False,
         }
         return features_dict
     
@@ -56,6 +58,51 @@ class Extractor():
         '''Returns the domain of the given URL'''
         return url.split("://")[1].split("/")[0].split(".")[-2]
     
+    def get_forms(self, html_code):
+        '''Returns a list of forms in the given HTML code'''
+        soup = BeautifulSoup(html_code, 'html.parser')
+        forms = soup.find_all('form')
+        return forms
+
+    # TODO
+    def get_urls(self, html_code):
+        raise NotImplementedError
+        '''Returns a list of urls in the given HTML code'''
+        soup = BeautifulSoup(html_code, 'html.parser')
+        # Extract all hyperlinks from the HTML code
+        hyperlinks = soup.find_all('a')
+        # Extract the URLs from the hyperlinks
+        urls = [link.get('href') for link in hyperlinks]
+        return urls
+    
+    # TODO: Move to utils
+    def get_main_domain(self, url):
+        """
+        Extracts the main domain from a URL using tldextract, which handles
+        cases including second-level country code TLDs.
+
+        PARAMETERS:
+        ------
+        url (str): The URL to extract the main domain from.
+
+        RETURNS:
+        ------
+        str: The main domain of the URL.
+        """
+        extracted = tldextract.extract(url)
+        # Combine the registered domain and the TLD
+        main_domain = "{}.{}".format(extracted.domain, extracted.suffix)
+        return main_domain
+    
+    def is_url_external(self, url_to_check, base_url):
+        '''Returns whether the given URL is external (points to a different domain - ignore subdomains)'''
+        base_domain = self.get_main_domain(base_url)
+        check_domain = self.get_main_domain(url_to_check)
+        print(base_domain, check_domain)
+
+        return base_domain.lower() != check_domain.lower()
+
+
     # ------------------------- Extraction functions
 
     def extract_subdomain_level(self, url):
@@ -103,22 +150,65 @@ class Extractor():
         return "//" in self.get_path(url)
 
     def extract_pct_ext_resource_urls(self, url, html_code):
+        urls = self.get_urls(html_code)
         pass
 
     def extract_insecure_forms(self, html_code):
-        pass
+        '''Extracts whether the given HTML code contains insecure forms (action attribute does not start with https) and returns it as a boolean'''
+        forms = self.get_forms(html_code)
+        # Get list of action attributes of the forms
+        form_actions = [form.get('action') for form in forms]
+        # Check if any of the form actions is insecure (does not start with https)
+        for action in form_actions:
+            if not action.startswith("https"):
+                return True
+        return False
 
     def extract_ext_form_action(self, url, html_code):
-        pass
+        forms = self.get_forms(html_code)
+        # Get list of action attributes of the forms
+        form_actions = [form.get('action') for form in forms]
+        # Check if any of the form actions contains an external URL
+        for action in form_actions:
+            if self.is_url_external(action, url):
+                return True
+        return False
 
     def extract_popup_window(self, html_code):
-        pass
+        '''Extracts whether the given HTML code contains a popup window and returns it as a boolean'''
+        soup = BeautifulSoup(html_code, 'html.parser')
+        scripts = soup.find_all('script')
+
+        # Patterns to search for in JavaScript
+        popup_patterns = [r'window\.open\(', r'alert\(', r'confirm\(', r'prompt\(']
+
+        for script in scripts:
+            if script.string:
+                for pattern in popup_patterns:
+                    if re.search(pattern, script.string):
+                        return True
+
+        return False
 
     def extract_iframe_or_frame(self, html_code):
-        pass
+        '''Extracts whether the given HTML code contains an iframe or frame and returns it as a boolean'''
+        soup = BeautifulSoup(html_code, 'html.parser')
+        iframes = soup.find_all('iframe')
+        frames = soup.find_all('frame')
+        return len(iframes) > 0 or len(frames) > 0
 
-    def extract_images_only_in_forms(self, ht):
-        pass
+    def extract_images_only_in_forms(self, html_code):
+        '''Extracts whether the given HTML code contains forms that only contain images and returns it as a boolean'''
+        soup = BeautifulSoup(html_code, 'html.parser')
+        forms = soup.find_all('form')
+
+        for form in forms:
+            form_elements = form.find_all()
+            # TODO: if all(elem.name == 'img' or (elem.name == 'input' and elem.get('type') == 'image') for elem in form_elements): 
+            if all(elem.name == 'img' for elem in form_elements):
+                return True
+
+        return False
 
 
 # Test the extractor
@@ -168,9 +258,28 @@ test_html_code = """
             <input type="text" name="q">
             <input type="submit" value="Search">
         </form>
+        <form action="https://www.evil.com/search">
+            <input type="text" name="q">
+            <input type="submit" value="Search">
+        </form> 
+        <form action="https://www.google.com/search">
+        <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">
+        <input type="image" src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">    
+        </form>
+        <form action="https://www.google.com/search">
+            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">
+            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">    
+        </form>
+        <a href="https://www.google.com/search">Search</a>
         <script>
             window.open("https://www.google.com/search");
         </script>
     </body>
 </html>
 """
+#print(ex.get_urls(test_html_code))
+print(ex.extract_insecure_forms(test_html_code))
+print(ex.extract_ext_form_action(test_url, test_html_code))
+print(ex.extract_popup_window(test_html_code))
+print(ex.extract_iframe_or_frame(test_html_code))
+print(ex.extract_images_only_in_forms(test_html_code))
