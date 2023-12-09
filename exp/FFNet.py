@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.nn.init as init
 
 class FFNet(nn.Module):
 
@@ -25,109 +26,128 @@ class FFNet(nn.Module):
             if i == 0:
                 # Input Layer + First Hidden Layer
                 self.hidden_layers.append(nn.Linear(input_size, hidden_sizes[i]))
+                self.hidden_layers[i].activation_function = activations[i]
             else:
                 # Hidden Layers
                 self.hidden_layers.append(nn.Linear(hidden_sizes[i-1], hidden_sizes[i]))
+                self.hidden_layers[i].activation_function = activations[i]
             nn.init.xavier_uniform_(self.hidden_layers[i].weight)
             
         # Output Layer
         print(f"Dimension of output: {output_size}")
         self.output = nn.Linear(hidden_sizes[-1], output_size)
-        nn.init.xavier_uniform_(self.output.weight)
-        
+        # Initialize weights
+        for hidden_layer in self.hidden_layers:
+            if hidden_layer.activation_function == 'ReLU':
+                init.kaiming_uniform_(hidden_layer.weight, nonlinearity='relu')
+            elif hidden_layer.activation_function in ['Sigmoid', 'tanh']:
+                init.xavier_uniform_(hidden_layer.weight)
+            else:
+                 init.uniform_(hidden_layer.weight, -0.01, 0.01)
+            hidden_layer.bias.data.fill_(0.01)        
+
 
     def forward(self, x):
-        for i in range(self.hidden_len):
-            activation_type = self.activation_functions[i]
+        for hidden_layer in self.hidden_layers:
+            activation_type = hidden_layer.activation_function
             if (activation_type == "ReLU"):
-                x = F.relu(self.hidden_layers[i](x))
+                x = F.relu(hidden_layer(x))
             elif (activation_type == "Sigmoid"):
-                x = F.sigmoid(self.hidden_layers[i](x))
+                x = F.sigmoid(hidden_layer(x))
         x = self.output(x)
         return x
 
+def create_FFNet():
+    # >>>>>> PREPARE DATA
+    import pandas as pd
+    import numpy as np
+    from sklearn.preprocessing import LabelEncoder
+    from sklearn.model_selection import train_test_split
 
-config = {
-    "input": 48,
-    "output": 2,
-    "hidden": [48, 52, 52, 52, 48, 48, 48],
-    "activations": ["ReLU", "ReLU", "ReLU", "Sigmoid", "ReLU", "Sigmoid", "Sigmoid"]
-}
-input_size = config['input']
-hidden_sizes = config['hidden']
-output_size = config['output']
-activations = config["activations"]
+    # Read data from csv file
+    df = pd.read_csv(filepath_or_buffer="./exp/dataset.csv", sep=";")
 
-import torch.optim as optim
+    model_features = [
+        "SubdomainLevel",
+        "UrlLength",
+        "NumDashInHostname",
+        "TildeSymbol",
+        "NumPercent",
+        "NumAmpersand",
+        "NumNumericChars",
+        "DomainInSubdomains",
+        "HttpsInHostname",
+        "PathLength",
+        "DoubleSlashInPath",
+        "PctExtResourceUrls",
+        "InsecureForms",
+        "ExtFormAction",
+        "PopUpWindow",
+        "IframeOrFrame",
+        "ImagesOnlyInForm",
+    ]
+    df = df.replace('10.000.000.000', 1.0)
+    # Split data into features and targets
+    X = df.drop(["id", "CLASS_LABEL"], axis=1)
+    X = X[model_features]
+    y = df["CLASS_LABEL"]
 
-# Init feed forward network
-net = FFNet(input_size, hidden_sizes, output_size, activations)
-criterion = nn.CrossEntropyLoss() # Loss function
-optimizer = optim.Adam(net.parameters(), lr=0.001) # Optimizer for backpropagation
+    # Create training, test and validation data
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1)
 
-# Training
-# Read data from csv file
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
 
-# Read data from csv file
-df = pd.read_csv(filepath_or_buffer="./exp/dataset.csv", sep=";")
+    # Encode labels
+    le = LabelEncoder()
+    y_train = le.fit_transform(y_train)
+    y_val = le.transform(y_val)
 
-df = df.replace('10.000.000.000', 1.0)
-# Split data into features and targets
-X = df.drop(["id", "CLASS_LABEL"], axis=1)
-y = df["CLASS_LABEL"]
+    # Scale the features 
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_val = scaler.transform(X_val)
 
+    import torch
+    from torch.utils.data import TensorDataset
 
-# Create training and test data
-from sklearn.preprocessing import StandardScaler
+    # Convert to tensors
+    X_train, y_train = torch.tensor(X_train, dtype=torch.float32), torch.tensor(y_train, dtype=torch.long)
+    X_val, y_val = torch.tensor(X_val, dtype=torch.float32), torch.tensor(y_val, dtype=torch.long)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+    # Create datasets
+    train_dataset = TensorDataset(X_train, y_train)
+    val_dataset = TensorDataset(X_val, y_val)
 
-# Encode labels TODO: what happens here?
-le = LabelEncoder()
-y_train = le.fit_transform(y_train)
-y_test = le.transform(y_test)
+    # >>>>>> INIT MODEL
+    config = {
+        "input": len(model_features),
+        "output": 2,
+        "hidden": [len(model_features),  48],
+        "activations": ["ReLU", "Sigmoid"]
+    }
+    input_size = config['input']
+    hidden_sizes = config['hidden']
+    output_size = config['output']
+    activations = config["activations"]
+    net = FFNet(input_size, hidden_sizes, output_size, activations)
 
-# Convert data to tensors
-import torch
-X_train = X_train.astype(float)
-X_test = X_test.astype(float)
-y_train = y_train.astype(float)
-y_test = y_test.astype(float)
+    # >>>>>> TRAIN MODEL
+    import torch.optim as optim
+    criterion = nn.CrossEntropyLoss() # Loss function
+    optimizer = optim.Adam(net.parameters(), lr=0.00001) # Optimizer for backpropagation
 
-# Scale the features TODO: What happens here?
-#scaler = StandardScaler()
-#X_train = scaler.fit_transform(X_train)
-#X_test = scaler.transform(X_test)
-X_train = X_train.to_numpy()
-X_test = X_test.to_numpy()
+    from Trainer import Trainer
+    trainer = Trainer(model=net, criterion=criterion, optimizer=optimizer)
+    trainer.load_data(train_dataset, val_dataset, batch_size=32)
+    trainer.train(num_epochs=200)
+    print(trainer.evaluate())
 
-X_train = torch.tensor(X_train)
-X_test = torch.tensor(X_test)
-y_train = torch.tensor(y_train)
-y_test = torch.tensor(y_test)
+    # Export the best model
+    torch.save(net.state_dict(), "./exp/model.pt")
 
-# Transform data to float32
-X_train = X_train.float()
-X_test = X_test.float()
-y_train = y_train.long()
-y_test = y_test.long()
+if __name__ == "__main__":
+    create_FFNet()
 
-# Print dtypes and shapes
-print(f"X_train: {X_train.dtype}, {X_train.shape}")
-print(f"y_train: {y_train.dtype}, {y_train.shape}")
-print(f"X_test: {X_test.dtype}, {X_test.shape}")
-print(f"y_test: {y_test.dtype}, {y_test.shape}")
-
-
-# Train model
-from Trainer import Trainer
-trainer = Trainer(model=net, criterion=criterion, optimizer=optimizer)
-trainer.train(num_epochs=10, batch_size=32, train_x=X_train, train_y=y_train)
-trainer.validate(test_x=X_test, test_y=y_test)
 
 
 
