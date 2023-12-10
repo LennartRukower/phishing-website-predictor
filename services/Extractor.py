@@ -8,7 +8,7 @@ class Extractor():
     '''Provides functions to extract features from a URL and its HTML code'''
 
     def __init__(self):
-        self.tlds_filepath = 'tlds-alpha-by-domain.txt'
+        self.tlds_filepath = './services/tlds-alpha-by-domain.txt'
 
     def extract_features(self, url, html_code):
         '''Extracts the features from the given URL and HTML code and returns them as a dictionary'''
