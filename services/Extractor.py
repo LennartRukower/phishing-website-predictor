@@ -2,12 +2,13 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 import tldextract
 import re
+import socket
 
 class Extractor():
     '''Provides functions to extract features from a URL and its HTML code'''
 
     def __init__(self):
-        pass
+        self.tlds_filepath = 'tlds-alpha-by-domain.txt'
 
     def extract_features(self, url, html_code):
         '''Extracts the features from the given URL and HTML code and returns them as a dictionary'''
@@ -63,6 +64,12 @@ class Extractor():
         soup = BeautifulSoup(html_code, 'html.parser')
         forms = soup.find_all('form')
         return forms
+
+    def get_tlds_from_file(self, file_path):
+        '''Returns TLDs from official file'''
+        with open(file_path, 'r') as file:
+            tlds = [line.strip() for line in file]
+        return tlds
 
     # TODO
     def get_urls(self, html_code):
@@ -210,6 +217,153 @@ class Extractor():
 
         return False
 
+    def extract_num_dots(self, url):
+        '''Extracts the total number of dots of the URL and returns as an integer'''
+        return url.count('.')
+    
+    def extract_path_level(self, url):
+        '''Extracts path level of the URL'''
+        parsed_url = urlparse(url)
+        path_segments = parsed_url.path.strip('/').split('/')
+        depth = len(path_segments)
+        return depth
+    
+    def extract_num_dash(self, url):
+        '''Extracts the total number of dashes in the URL'''
+        return url.count('-')
+    
+    def extract_at_symbol(self, url):
+        '''Checks if “@” symbol exist in webpage URL'''
+        return '@' in url
+    
+    def extract_num_underscore(self, url):
+        '''Counts the number of “_” in webpage URL'''
+        return url.count('_')
+    
+    def extract_num_query_components(self, url):
+        '''Counts the number of query parts in webpage URL'''
+        pass
+    
+    def extract_num_hash(self, url):
+        '''Counts the number of “#” in webpage URL'''
+        return url.count("#")
+    
+    '''
+    def extract_no_https(self, url):
+        #Checks if HTTPS exist in webpage URL
+        #An der Stelle schwierig zu sagen, ob generell der string https gemeint ist oder wirklich das protokoll
+        #ich würde es zur Sicherheit weglassen
+        return 'https' in url
+    '''
+    
+    def extract_ip_address(self, url):
+        '''Checks if IP address is used in hostname part of webpage URL'''
+        parsed_url = urlparse(url)
+        hostname = parsed_url.hostname
+    
+        if not hostname:
+            return "Invalid"
+
+        try:
+            socket.inet_aton(hostname)
+            return True
+        except socket.error:
+            return False
+
+    def extract_domain_in_paths(self, url, file_path):
+        '''Checks if TLD or ccTLD is used in the path of webpage URL'''
+        parsed_url = urlparse(url)
+        path = parsed_url.path
+
+        last_path_part = path.split("/")[-1]
+
+        tld_list = self.get_tlds_from_file(file_path)
+
+        for tld in tld_list:
+            if tld in last_path_part:
+                return True
+
+        return False
+
+    def extract_hostname_length(self, url):
+        '''Counts the total characters in hostname part of webpage URL'''
+        parsed_url = urlparse(url)
+        hostname = parsed_url.hostname
+
+        if hostname:
+            return len(hostname)
+        else:
+            return 0
+
+    def extract_query_length(self, url):
+        '''Counts the total characters in query part of webpage URL'''
+        parsed_url = urlparse(url)
+        query = parsed_url.query
+
+        return len(query)
+
+    def extract_num_sensitive_words(self, url):
+        '''Counts the number of sensitive words (i.e., “secure”, “account”, “webscr”, “login”,
+        “ebayisapi”, “signin”, “banking”, “confirm”) in webpage URL'''
+        sensitive_words = ["secure", "account", "webscr", "login", "ebayisapi", "signin", "banking", "confirm"]
+
+        url_lower = url.lower()
+
+        count = 0
+        for word in sensitive_words:
+            if word in url_lower:
+                count += 1
+
+        return count
+
+    def extract_pct_ext_hyperlinks(self, html_code):
+        pass
+
+    def extract_ext_favicon(self, html_code):
+        pass
+
+    def extract_relative_form_action(self, html_code):
+        pass
+
+    def extract_abnormal_form_action(self, html_code):
+        '''TO DO!!!'''
+        pass
+
+    def extract_frequent_domain_name_mismatch(self, url, html_code):
+        pass
+
+    def extract_right_click_disabled(self, html_code):
+        pass
+
+    def extract_submit_info_to_email(self, html_code):
+        '''Check if HTML source code contains the HTML “mailto” function'''
+        html_lower = html_code.lower()
+        return "mailto:" in html_lower
+
+    def extract_missing_title(self, html_code):
+        '''Checks if the title tag is empty in HTML source code'''
+        # Define a regular expression to match the title tag
+        title_pattern = re.compile(r'<title>(.*?)</title>', re.DOTALL | re.IGNORECASE)
+
+        # Search for the title tag in the HTML content
+        match = title_pattern.search(html_code)
+
+        # If the title tag is found, check if it's empty
+        if match:
+            title_content = match.group(1).strip()
+            return title_content == ""
+        else:
+            return True
+
+    def extract_subdomain_level_rt(self):
+        pass
+
+    def extract_pct_ext_resources_urls_rt(self, html_code):
+        pass
+
+    def extract_ext_meta_script_link_rt(self):
+        pass
+
 
 # Test the extractor
 test_url = "https://www.google.com/search?q=hello&oq=hello&aqs=chrome..69i57j0l7.1002j0j7&sourceid=chrome&ie=UTF-8"
@@ -232,6 +386,18 @@ assert ex.extract_num_numeric_chars(test_url) == 13
 assert ex.extract_https_in_hostname(test_url) == False
 assert ex.extract_path_length(test_url) == 6
 assert ex.extract_double_slash_in_path(test_url) == False
+assert ex.extract_num_dots(test_url) == 5
+assert ex.extract_path_level(test_url) == 1
+assert ex.extract_num_dash(test_url) == 1
+assert ex.extract_at_symbol(test_url) == False
+assert ex.extract_num_underscore(test_url) == 0
+assert ex.extract_num_hash(test_url) == 0
+#assert ex.extract_no_https(test_url) == True
+assert ex.extract_ip_address(test_url) == False
+assert ex.extract_domain_in_paths(test_url, ex.tlds_filepath) == False
+assert ex.extract_hostname_length(test_url) == 14
+assert ex.extract_query_length(test_url) == 72
+assert ex.extract_num_sensitive_words(test_url) == 0
 
 # Insecure and posibble phishing test url
 test_url = "http://https.secure-url.googel.com/search//value?~q=hello&oq=hello&aqs=chrome..69i57j0l7.1002j0j7&sourceid=chrome&ie=UTF-8%"
@@ -245,6 +411,18 @@ assert ex.extract_num_numeric_chars(test_url) == 13
 assert ex.extract_https_in_hostname(test_url) == True
 assert ex.extract_path_length(test_url) == 13
 assert ex.extract_double_slash_in_path(test_url) == True
+assert ex.extract_num_dots(test_url) == 6
+assert ex.extract_path_level(test_url) == 3
+assert ex.extract_num_dash(test_url) == 2
+assert ex.extract_at_symbol(test_url) == False
+assert ex.extract_num_underscore(test_url) == 0
+assert ex.extract_num_hash(test_url) == 0
+#assert ex.extract_no_https(test_url) == False
+assert ex.extract_ip_address(test_url) == False
+assert ex.extract_domain_in_paths(test_url, ex.tlds_filepath) == False
+assert ex.extract_hostname_length(test_url) == 27
+assert ex.extract_query_length(test_url) == 74
+assert ex.extract_num_sensitive_words(test_url) == 1
 
 print("Extraction functions work as expected")
 
