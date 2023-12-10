@@ -162,3 +162,78 @@ If form action contains foreign domain, "about:blank" or empty string.
 
 ## PctExtNullSelfRedirectHyperlinksRT
 Percentage of hyperlinks in html content that uses differen domain names, start with ' or usess JavaScript ::void(0).
+
+## 1. NumDots
+Number of dots overall
+
+## 3. PathLevel
+Path depths = how many slashes are after the domain
+
+## 5. NumDash
+Number of - in URL
+	
+## 7. AtSymbol
+@ symbol in the link? true or false
+	
+## 9. NumUnderscore
+Number of _ in URL
+	
+## 11. NumQueryComponents
+?
+	
+## 13. NumHash
+Number of # in URL
+	
+## 15. NoHttps
+https? true or false
+	
+## 17. IpAddress
+Is hostname a domain or ip address?
+extractable with checking if 4 numbers in hostname or not
+	
+## 19. DomainInPaths
+Is top level domain in the path (.com, .de, etc)? true or false
+--> does it occur after the hostnames '/'
+	
+## 21. HostnameLength
+How many characters in hostname (www.google.com has 14)
+
+## 23. QueryLength
+How many characters after '?'
+	
+## 25. NumSensitiveWords
+How many of these words are in the URL:  “secure”, “account”, “webscr”, “login”, “ebayisapi”, “signin”, “banking”, “confirm"
+	
+## 27. PctExtHyperlinks
+?
+	
+## 29. ExtFavicon
+?
+	
+## 31. RelativeFormAction
+?
+	
+## 33. AbnormalFormAction
+to do
+	
+## 35. FrequentDomainNameMismatch
+?
+	
+## 37. RightClickDisabled
+?
+	
+## 39. SubmitInfoToEmail
+is in html source code the 'mailto' function? true/false
+
+## 41. MissingTitle
+is title tag in html code empty? true/false
+	
+## 43. SubdomainLevelRT
+?
+	
+## 45. PctExtResourceUrlsRT
+?
+	
+## 47. ExtMetaScriptLinkRT
+?
+
