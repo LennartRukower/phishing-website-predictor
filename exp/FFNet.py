@@ -68,22 +68,36 @@ def create_FFNet():
     df = pd.read_csv(filepath_or_buffer="./exp/dataset.csv", sep=";")
 
     model_features = [
+        "NumDots",
         "SubdomainLevel",
+        "PathLevel",    
         "UrlLength",
+        "NumDash",
         "NumDashInHostname",
+        "AtSymbol",
         "TildeSymbol",
+        "NumUnderscore",
         "NumPercent",
+        "NumQueryComponents",
         "NumAmpersand",
+        "NumHash",
         "NumNumericChars",
+        "IpAddress",
         "DomainInSubdomains",
+        "DomainInPaths",
         "HttpsInHostname",
+        "HostnameLength",
         "PathLength",
+        "QueryLength",
         "DoubleSlashInPath",
+        "NumSensitiveWords",
         "PctExtResourceUrls",
         "InsecureForms",
         "ExtFormAction",
         "PopUpWindow",
+        "SubmitInfoToEmail",
         "IframeOrFrame",
+        "MissingTitle",
         "ImagesOnlyInForm",
     ]
     df = df.replace('10.000.000.000', 1.0)
@@ -93,7 +107,7 @@ def create_FFNet():
     y = df["CLASS_LABEL"]
 
     # Create training, test and validation data
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.05, random_state=42)
 
     from sklearn.preprocessing import StandardScaler
 
@@ -122,8 +136,8 @@ def create_FFNet():
     config = {
         "input": len(model_features),
         "output": 2,
-        "hidden": [len(model_features),  48],
-        "activations": ["ReLU", "Sigmoid"]
+        "hidden": [len(model_features),  48, 48],
+        "activations": ["ReLU", "ReLU", "Sigmoid"]
     }
     input_size = config['input']
     hidden_sizes = config['hidden']
@@ -135,14 +149,28 @@ def create_FFNet():
     import torch.optim as optim
     criterion = nn.CrossEntropyLoss() # Loss function
     optimizer = optim.Adam(net.parameters(), lr=0.00001) # Optimizer for backpropagation
+    batch_size = 64
+    epochs = 500
 
     from Trainer import Trainer
     trainer = Trainer(model=net, criterion=criterion, optimizer=optimizer)
-    trainer.load_data(train_dataset, val_dataset, batch_size=32)
-    trainer.train(num_epochs=200)
-    print(trainer.evaluate())
+    trainer.load_data(train_dataset, val_dataset, batch_size=batch_size)
+    losses = trainer.train(num_epochs=epochs)
+    import matplotlib.pyplot as plt
+    plt.plot(losses)
+    plt.show()
 
-    # Export the best model
+    print(trainer.evaluate())
+    # Save training results to file
+    with open("./exp/results.txt", "w") as f:
+        f.write(f"Number of hidden layers: {len(hidden_sizes)}\n")
+        f.write(f"Batch size: {batch_size}\n")
+        f.write(f"Number of epochs: {epochs}\n")
+        f.write(f"Training loss: {losses[-1]}\n")
+        f.write(f"Validation accuracy: {trainer.evaluate()}\n")
+        f.write(f"Max loss: {max(losses)}, Min loss: {min(losses)}\n")
+        f.write("-------------------------------------\n")
+
     torch.save(net.state_dict(), "./exp/model.pt")
 
 if __name__ == "__main__":
