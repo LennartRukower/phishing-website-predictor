@@ -19,7 +19,7 @@ class Trainer():
         self.train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
         self.val_loader = DataLoader(val_data, batch_size=batch_size)
         
-    def train(self, num_epochs, with_val=True):
+    def train(self, num_epochs, stop_criterion = None):
         # Check if loaders are initialized
         if self.train_loader is None or self.val_loader is None:
             raise Exception('Loaders are not initialized. Call load_data() before training.')
@@ -30,7 +30,12 @@ class Trainer():
                 outputs = self.model.forward(inputs)
                 loss = self.criterion(outputs, labels)
                 losses.append(loss.item())
-                
+
+                # Checks if the loss is below the stop criterion
+                if stop_criterion is not None and loss < stop_criterion:
+                    print (f"Training stopped at epoch {epoch+1}/{num_epochs}, Loss: {losses[-1]:.4f}")
+                    return losses
+            
                 # Backward and optimize
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -38,6 +43,7 @@ class Trainer():
             if epoch % 10 == 0:
                 print(f'Epoch {epoch+1}/{num_epochs}, Loss: {losses[-1]:.4f}')
         print (f"Final Training Loss: {losses[-1]:.4f}")
+        return losses
             
     def evaluate(self):
         all_preds = []

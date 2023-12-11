@@ -148,9 +148,10 @@ def create_FFNet():
     # >>>>>> TRAIN MODEL
     import torch.optim as optim
     criterion = nn.CrossEntropyLoss() # Loss function
-    optimizer = optim.Adam(net.parameters(), lr=0.00001) # Optimizer for backpropagation
-    batch_size = 64
-    epochs = 500
+    lr = 0.000001 # Learning rate
+    optimizer = optim.Adam(net.parameters(), lr=lr) # Optimizer for backpropagation
+    batch_size = 80
+    epochs = 1000
 
     from Trainer import Trainer
     trainer = Trainer(model=net, criterion=criterion, optimizer=optimizer)
@@ -162,10 +163,11 @@ def create_FFNet():
 
     print(trainer.evaluate())
     # Save training results to file
-    with open("./exp/results.txt", "w") as f:
+    with open("./exp/results.txt", "a") as f:
         f.write(f"Number of hidden layers: {len(hidden_sizes)}\n")
         f.write(f"Batch size: {batch_size}\n")
         f.write(f"Number of epochs: {epochs}\n")
+        f.write(f"Learning rate: {lr}\n")
         f.write(f"Training loss: {losses[-1]}\n")
         f.write(f"Validation accuracy: {trainer.evaluate()}\n")
         f.write(f"Max loss: {max(losses)}, Min loss: {min(losses)}\n")

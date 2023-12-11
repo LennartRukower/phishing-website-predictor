@@ -1,0 +1,24 @@
+Number of hidden layers: 3
+Batch size: 64
+Number of epochs: 500
+Learning rate: 1e-06
+Training loss: 0.6775885224342346
+Validation accuracy: (0.598, 0.5979376483417795, 0.5977260725544478, 0.5976378740866779)
+Max loss: 0.7869908213615417, Min loss: 0.6425552368164062
+-------------------------------------
+Number of hidden layers: 3
+Batch size: 80
+Number of epochs: 500
+Learning rate: 1e-06
+Training loss: 0.6770225763320923
+Validation accuracy: (0.638, 0.638, 0.6380198748619801, 0.6379869675308311)
+Max loss: 0.8252091407775879, Min loss: 0.6321297287940979
+-------------------------------------
+Number of hidden layers: 3
+Batch size: 80
+Number of epochs: 1000
+Learning rate: 1e-06
+Training loss: 0.6918628811836243
+Validation accuracy: (0.64, 0.6415024412252857, 0.6405242354899106, 0.6395328345535813)
+Max loss: 0.7345888614654541, Min loss: 0.6648975014686584
+-------------------------------------
