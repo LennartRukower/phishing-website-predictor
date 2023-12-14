@@ -1,61 +1,90 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.init as init
+import torch
 
 class FFNet(nn.Module):
 
-    hidden_layers = []
-    hidden_len = 0
-    activation_functions = []
-
-    
     def __init__(self, input_size, hidden_sizes, output_size, activations):
         super().__init__()
         hidden_len = len(hidden_sizes)
         self.activation_functions = activations
 
         # Check if an activation function is provided for every hidden layer
-        if hidden_len != len(activations):
-            raise Exception("Number of hidden layers and activation functions do not match!") 
+        if hidden_len + 1 != len(activations):
+            raise Exception("Number of hidden + output layers and activation functions do not match!") 
 
         print(f"Dimension of input: {input_size}")
         print(f"Number of hidden layers: {hidden_len}")
 
         self.hidden_layers = nn.ModuleList()
         for i in range(hidden_len):
-            if i == 0:
-                # Input Layer + First Hidden Layer
-                self.hidden_layers.append(nn.Linear(input_size, hidden_sizes[i]))
-                self.hidden_layers[i].activation_function = activations[i]
-            else:
-                # Hidden Layers
-                self.hidden_layers.append(nn.Linear(hidden_sizes[i-1], hidden_sizes[i]))
-                self.hidden_layers[i].activation_function = activations[i]
-            nn.init.xavier_uniform_(self.hidden_layers[i].weight)
+            in_features = input_size if i == 0 else hidden_sizes[i-1]
+            layer = nn.Linear(in_features, hidden_sizes[i])
+            self.hidden_layers.append(layer)
+            if activations[i] == 'ReLU':
+                init.kaiming_uniform_(layer.weight, nonlinearity='relu')
+            else:  # For Sigmoid or Tanh
+                init.xavier_uniform_(layer.weight)
+            layer.bias.data.fill_(0.00)
+
+        #for i in range(hidden_len):
+        #    if i == 0:
+        #        # Input Layer + First Hidden Layer
+        #        self.hidden_layers.append(nn.Linear(input_size, hidden_sizes[i]))
+        #        self.hidden_layers[i].activation_function = activations[i]
+        #    else:
+        #        # Hidden Layers
+        #        self.hidden_layers.append(nn.Linear(hidden_sizes[i-1], hidden_sizes[i]))
+        #        self.hidden_layers[i].activation_function = activations[i]
+        #    nn.init.xavier_uniform_(self.hidden_layers[i].weight)
             
         # Output Layer
         print(f"Dimension of output: {output_size}")
         self.output = nn.Linear(hidden_sizes[-1], output_size)
+        # Initialize output layer weights
+        if activations[-1] == 'ReLU':
+            init.kaiming_uniform_(self.output.weight, nonlinearity='relu')
+        else:
+            init.xavier_uniform_(self.output.weight)
+        self.output.bias.data.fill_(0.00)
         # Initialize weights
-        for hidden_layer in self.hidden_layers:
-            if hidden_layer.activation_function == 'ReLU':
-                init.kaiming_uniform_(hidden_layer.weight, nonlinearity='relu')
-            elif hidden_layer.activation_function in ['Sigmoid', 'tanh']:
-                init.xavier_uniform_(hidden_layer.weight)
-            else:
-                 init.uniform_(hidden_layer.weight, -0.01, 0.01)
-            hidden_layer.bias.data.fill_(0.01)        
+        # for hidden_layer in self.hidden_layers:
+        #     if hidden_layer.activation_function == 'ReLU':
+        #         init.kaiming_uniform_(hidden_layer.weight, nonlinearity='relu')
+        #     elif hidden_layer.activation_function in ['Sigmoid', 'tanh']:
+        #         init.xavier_uniform_(hidden_layer.weight)
+        #     else:
+        #          init.uniform_(hidden_layer.weight, -0.01, 0.01)
+        #     hidden_layer.bias.data.fill_(0.01)        
 
 
     def forward(self, x):
-        for hidden_layer in self.hidden_layers:
-            activation_type = hidden_layer.activation_function
-            if (activation_type == "ReLU"):
-                x = F.relu(hidden_layer(x))
-            elif (activation_type == "Sigmoid"):
-                x = F.sigmoid(hidden_layer(x))
+        # Forward pass for hidden layers
+        for i, hidden_layer in enumerate(self.hidden_layers):
+            x = hidden_layer(x)
+            if self.activation_functions[i] == "ReLU":
+                x = F.relu(x)
+            elif self.activation_functions[i] == "Sigmoid":
+                x = torch.sigmoid(x)
         x = self.output(x)
+        if self.activation_functions[-1] == "Sigmoid":
+            x = torch.sigmoid(x)
         return x
+
+        # for hidden_layer in self.hidden_layers:
+        #     activation_type = hidden_layer.activation_function
+        #     if (activation_type == "ReLU"):
+        #         x = F.relu(hidden_layer(x))
+        #     elif (activation_type == "Sigmoid"):
+        #         x = torch.sigmoid(hidden_layer(x))
+        # x = self.output(x)
+        # # Check which activation function to use for the output layer
+        # if self.activation_functions[-1] == "Sigmoid":
+        #     x = torch.sigmoid(x)
+        # elif self.activation_functions[-1] == "ReLU":
+        #     x = F.relu(x)
+        # return x
 
 def create_FFNet():
     # >>>>>> PREPARE DATA
@@ -121,7 +150,6 @@ def create_FFNet():
     X_train = scaler.fit_transform(X_train)
     X_val = scaler.transform(X_val)
 
-    import torch
     from torch.utils.data import TensorDataset
 
     # Convert to tensors
@@ -135,23 +163,25 @@ def create_FFNet():
     # >>>>>> INIT MODEL
     config = {
         "input": len(model_features),
-        "output": 2,
-        "hidden": [len(model_features),  48, 48],
-        "activations": ["ReLU", "ReLU", "Sigmoid"]
+        "output": 1,
+        "hidden": [64, 80, 126, 80, 64, 32],
+        "activations": ["ReLU", "ReLU", "ReLU", "ReLU","ReLU", "Sigmoid", "Sigmoid"]
     }
     input_size = config['input']
     hidden_sizes = config['hidden']
     output_size = config['output']
     activations = config["activations"]
     net = FFNet(input_size, hidden_sizes, output_size, activations)
+    # Print model summary
+    print(net)
 
     # >>>>>> TRAIN MODEL
     import torch.optim as optim
-    criterion = nn.CrossEntropyLoss() # Loss function
-    lr = 0.000001 # Learning rate
+    criterion = nn.BCELoss() # Loss function
+    lr = 0.001 # Learning rate
     optimizer = optim.Adam(net.parameters(), lr=lr) # Optimizer for backpropagation
-    batch_size = 80
-    epochs = 1000
+    batch_size = 32
+    epochs = 250
 
     from Trainer import Trainer
     trainer = Trainer(model=net, criterion=criterion, optimizer=optimizer)
@@ -161,18 +191,19 @@ def create_FFNet():
     plt.plot(losses)
     plt.show()
 
-    print(trainer.evaluate())
-    # Save training results to file
+    accuracy, precision, recall, f1 = trainer.evaluate()
     with open("./exp/results.txt", "a") as f:
         f.write(f"Number of hidden layers: {len(hidden_sizes)}\n")
         f.write(f"Batch size: {batch_size}\n")
         f.write(f"Number of epochs: {epochs}\n")
+        f.write(f"Loss function: {criterion.__class__.__name__}\n")
         f.write(f"Learning rate: {lr}\n")
         f.write(f"Training loss: {losses[-1]}\n")
-        f.write(f"Validation accuracy: {trainer.evaluate()}\n")
+        f.write(f"Validation accuracy: {accuracy}\n")
         f.write(f"Max loss: {max(losses)}, Min loss: {min(losses)}\n")
         f.write("-------------------------------------\n")
 
+    # Save training results to file
     torch.save(net.state_dict(), "./exp/model.pt")
 
 if __name__ == "__main__":
