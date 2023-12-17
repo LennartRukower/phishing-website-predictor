@@ -375,100 +375,137 @@ class Extractor():
     def extract_ext_meta_script_link_rt(self):
         pass
 
+def test_extractor():
+    # Test the extractor
+    test_url = "https://www.google.com/search?q=hello&oq=hello&aqs=chrome..69i57j0l7.1002j0j7&sourceid=chrome&ie=UTF-8"
+    ex = Extractor()
+    # Test the helper functions
+    assert ex.get_subdomains(test_url) == ["www"]
+    assert ex.get_path(test_url) == "search"
+    assert ex.get_hostname(test_url) == "www.google.com"
+    assert ex.get_domain(test_url) == "google"
+    print("Helper functions work as expected")
 
-# Test the extractor
-test_url = "https://www.google.com/search?q=hello&oq=hello&aqs=chrome..69i57j0l7.1002j0j7&sourceid=chrome&ie=UTF-8"
-ex = Extractor()
-# Test the helper functions
-assert ex.get_subdomains(test_url) == ["www"]
-assert ex.get_path(test_url) == "search"
-assert ex.get_hostname(test_url) == "www.google.com"
-assert ex.get_domain(test_url) == "google"
-print("Helper functions work as expected")
+    # Test the extraction functions
+    assert ex.extract_subdomain_level(test_url) == 1
+    assert ex.extract_url_length(test_url) == 102
+    assert ex.extract_num_dash_in_hostname(test_url) == 0
+    assert ex.extract_tilde_symbol(test_url) == False
+    assert ex.extract_num_percent(test_url) == 0
+    assert ex.extract_num_ampersand(test_url) == 4
+    assert ex.extract_num_numeric_chars(test_url) == 13
+    assert ex.extract_https_in_hostname(test_url) == False
+    assert ex.extract_path_length(test_url) == 6
+    assert ex.extract_double_slash_in_path(test_url) == False
+    assert ex.extract_num_dots(test_url) == 5
+    assert ex.extract_path_level(test_url) == 1
+    assert ex.extract_num_dash(test_url) == 1
+    assert ex.extract_at_symbol(test_url) == False
+    assert ex.extract_num_underscore(test_url) == 0
+    assert ex.extract_num_hash(test_url) == 0
+    #assert ex.extract_no_https(test_url) == True
+    assert ex.extract_ip_address(test_url) == False
+    assert ex.extract_domain_in_paths(test_url, ex.tlds_filepath) == False
+    assert ex.extract_hostname_length(test_url) == 14
+    assert ex.extract_query_length(test_url) == 72
+    assert ex.extract_num_sensitive_words(test_url) == 0
 
-# Test the extraction functions
-assert ex.extract_subdomain_level(test_url) == 1
-assert ex.extract_url_length(test_url) == 102
-assert ex.extract_num_dash_in_hostname(test_url) == 0
-assert ex.extract_tilde_symbol(test_url) == False
-assert ex.extract_num_percent(test_url) == 0
-assert ex.extract_num_ampersand(test_url) == 4
-assert ex.extract_num_numeric_chars(test_url) == 13
-assert ex.extract_https_in_hostname(test_url) == False
-assert ex.extract_path_length(test_url) == 6
-assert ex.extract_double_slash_in_path(test_url) == False
-assert ex.extract_num_dots(test_url) == 5
-assert ex.extract_path_level(test_url) == 1
-assert ex.extract_num_dash(test_url) == 1
-assert ex.extract_at_symbol(test_url) == False
-assert ex.extract_num_underscore(test_url) == 0
-assert ex.extract_num_hash(test_url) == 0
-#assert ex.extract_no_https(test_url) == True
-assert ex.extract_ip_address(test_url) == False
-assert ex.extract_domain_in_paths(test_url, ex.tlds_filepath) == False
-assert ex.extract_hostname_length(test_url) == 14
-assert ex.extract_query_length(test_url) == 72
-assert ex.extract_num_sensitive_words(test_url) == 0
+    # Insecure and posibble phishing test url
+    test_url = "http://https.secure-url.googel.com/search//value?~q=hello&oq=hello&aqs=chrome..69i57j0l7.1002j0j7&sourceid=chrome&ie=UTF-8%"
+    assert ex.extract_subdomain_level(test_url) == 2
+    assert ex.extract_url_length(test_url) == 123
+    assert ex.extract_num_dash_in_hostname(test_url) == 1
+    assert ex.extract_tilde_symbol(test_url) == True
+    assert ex.extract_num_percent(test_url) == 1
+    assert ex.extract_num_ampersand(test_url) == 4
+    assert ex.extract_num_numeric_chars(test_url) == 13
+    assert ex.extract_https_in_hostname(test_url) == True
+    assert ex.extract_path_length(test_url) == 13
+    assert ex.extract_double_slash_in_path(test_url) == True
+    assert ex.extract_num_dots(test_url) == 6
+    assert ex.extract_path_level(test_url) == 3
+    assert ex.extract_num_dash(test_url) == 2
+    assert ex.extract_at_symbol(test_url) == False
+    assert ex.extract_num_underscore(test_url) == 0
+    assert ex.extract_num_hash(test_url) == 0
+    #assert ex.extract_no_https(test_url) == False
+    assert ex.extract_ip_address(test_url) == False
+    assert ex.extract_domain_in_paths(test_url, ex.tlds_filepath) == False
+    assert ex.extract_hostname_length(test_url) == 27
+    assert ex.extract_query_length(test_url) == 74
+    assert ex.extract_num_sensitive_words(test_url) == 1
 
-# Insecure and posibble phishing test url
-test_url = "http://https.secure-url.googel.com/search//value?~q=hello&oq=hello&aqs=chrome..69i57j0l7.1002j0j7&sourceid=chrome&ie=UTF-8%"
-assert ex.extract_subdomain_level(test_url) == 2
-assert ex.extract_url_length(test_url) == 123
-assert ex.extract_num_dash_in_hostname(test_url) == 1
-assert ex.extract_tilde_symbol(test_url) == True
-assert ex.extract_num_percent(test_url) == 1
-assert ex.extract_num_ampersand(test_url) == 4
-assert ex.extract_num_numeric_chars(test_url) == 13
-assert ex.extract_https_in_hostname(test_url) == True
-assert ex.extract_path_length(test_url) == 13
-assert ex.extract_double_slash_in_path(test_url) == True
-assert ex.extract_num_dots(test_url) == 6
-assert ex.extract_path_level(test_url) == 3
-assert ex.extract_num_dash(test_url) == 2
-assert ex.extract_at_symbol(test_url) == False
-assert ex.extract_num_underscore(test_url) == 0
-assert ex.extract_num_hash(test_url) == 0
-#assert ex.extract_no_https(test_url) == False
-assert ex.extract_ip_address(test_url) == False
-assert ex.extract_domain_in_paths(test_url, ex.tlds_filepath) == False
-assert ex.extract_hostname_length(test_url) == 27
-assert ex.extract_query_length(test_url) == 74
-assert ex.extract_num_sensitive_words(test_url) == 1
+    print("Extraction functions work as expected")
 
-print("Extraction functions work as expected")
-
-test_html_code = """
-<html>
-    <head>
-        <title>Test</title>
-    </head>
-    <body>
-        <form action="https://www.google.com/search">
-            <input type="text" name="q">
-            <input type="submit" value="Search">
-        </form>
-        <form action="https://www.evil.com/search">
-            <input type="text" name="q">
-            <input type="submit" value="Search">
-        </form> 
-        <form action="https://www.google.com/search">
-        <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">
-        <input type="image" src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">    
-        </form>
-        <form action="https://www.google.com/search">
+    test_html_code = """
+    <html>
+        <head>
+            <title>Test</title>
+        </head>
+        <body>
+            <form action="https://www.google.com/search">
+                <input type="text" name="q">
+                <input type="submit" value="Search">
+            </form>
+            <form action="https://www.evil.com/search">
+                <input type="text" name="q">
+                <input type="submit" value="Search">
+            </form> 
+            <form action="http://www.google.com/search">
             <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">
-            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">    
-        </form>
-        <a href="https://www.google.com/search">Search</a>
-        <script>
-            window.open("https://www.google.com/search");
-        </script>
-    </body>
-</html>
-"""
-#print(ex.get_urls(test_html_code))
-print(ex.extract_insecure_forms(test_html_code))
-print(ex.extract_ext_form_action(test_url, test_html_code))
-print(ex.extract_popup_window(test_html_code))
-print(ex.extract_iframe_or_frame(test_html_code))
-print(ex.extract_images_only_in_forms(test_html_code))
+            <input type="image" src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">    
+            </form>
+            <form action="https://www.google.com/search">
+                <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">
+                <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">    
+            </form>
+            <frame src="https://www.google.com/search">
+            <a href="https://www.google.com/search">Search</a>
+            <script>
+                window.open("https://www.google.com/search");
+            </script>
+        </body>
+    </html>
+    """
+    #print(ex.get_urls(test_html_code))
+    print(ex.extract_insecure_forms(test_html_code))
+    print(ex.extract_ext_form_action(test_url, test_html_code))
+    print(ex.extract_popup_window(test_html_code))
+    print(ex.extract_iframe_or_frame(test_html_code))
+    print(ex.extract_images_only_in_forms(test_html_code))
+
+    # Test the complete extraction
+    features_dict = ex.extract_features(test_url, test_html_code)
+    print(features_dict)
+    assert features_dict["SubdomainLevel"] == 2
+    assert features_dict["UrlLength"] == 123
+    assert features_dict["NumDashInHostname"] == 1
+    assert features_dict["TildeSymbol"] == True
+    assert features_dict["NumPercent"] == 1
+    assert features_dict["NumAmpersand"] == 4
+    assert features_dict["NumNumericChars"] == 13
+    assert features_dict["HttpsInHostname"] == True
+    assert features_dict["PathLength"] == 13
+    assert features_dict["DoubleSlashInPath"] == True
+    assert features_dict["InsecureForms"] == True
+    assert features_dict["ExtFormAction"] == True
+    assert features_dict["PopupWindow"] == True
+    assert features_dict["IframeOrFrame"] == True
+    assert features_dict["ImagesOnlyInForms"] == True
+    assert features_dict["NumDots"] == 6
+    assert features_dict["PathLevel"] == 3
+    assert features_dict["NumDash"] == 2
+    assert features_dict["AtSymbol"] == False
+    assert features_dict["NumUnderscore"] == 0
+    assert features_dict["NumHash"] == 0
+    assert features_dict["IpAddress"] == False
+    assert features_dict["DomainInPaths"] == False
+    assert features_dict["HostnameLength"] == 27
+    assert features_dict["QueryLength"] == 74
+    assert features_dict["NumSensitiveWords"] == 1
+    assert features_dict["SubmitInfoToEmail"] == False
+    assert features_dict["MissingTitle"] == False
+    print("Complete extraction works as expected")
+
+if __name__ == "__main__":
+    test_extractor()
