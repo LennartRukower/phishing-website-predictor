@@ -10,26 +10,37 @@ class Extractor():
     def extract_features(self, url, html_code):
         '''Extracts the features from the given URL and HTML code and returns them as a dictionary'''
 
-        # TODO: Call the different extraction functions
-        features_dict = {
-            "subdomain_level": 0,
-            "url_length": 0,
-            "num_dash_in_hostname": 0,
-            "tilde_symbol": False,
-            "num_percent": 0,
-            "num_ampersand": 0,
-            "num_numeric_chars": 0,
-            "domain_in_subdomains": False,
-            "https_in_hostname": False,
-            "path_length": 0,
-            "double_slash_in_path": False,
-            "pct_ext_resource_urls": 0.0,
-            "insecure_forms": False,
-            "ext_form_action": False,
-            "popup_window": False,
-            "iframe_or_frame": False,
-            "images_only_in_forms": False,
-        }
+        features_dict = {}
+
+        features_dict["SubdomainLevel"] = self.extract_subdomain_level(url)
+        features_dict["UrlLength"] = self.extract_url_length(url)
+        features_dict["NumDashInHostname"] = self.extract_num_dash_in_hostname(url)
+        features_dict["TildeSymbol"] = self.extract_tilde_symbol(url)
+        features_dict["NumPercent"] = self.extract_num_percent(url)
+        features_dict["NumAmpersand"] = self.extract_num_ampersand(url)
+        features_dict["NumNumericChars"] = self.extract_num_numeric_chars(url)
+        features_dict["HttpsInHostname"] = self.extract_https_in_hostname(url)
+        features_dict["PathLength"] = self.extract_path_length(url)
+        features_dict["DoubleSlashInPath"] = self.extract_double_slash_in_path(url)
+        features_dict["InsecureForms"] = self.extract_insecure_forms(html_code)
+        features_dict["ExtFormAction"] = self.extract_ext_form_action(url, html_code)
+        features_dict["PopupWindow"] = self.extract_popup_window(html_code)
+        features_dict["IframeOrFrame"] = self.extract_iframe_or_frame(html_code)
+        features_dict["ImagesOnlyInForms"] = self.extract_images_only_in_forms(html_code)
+        features_dict["NumDots"] = self.extract_num_dots(url)
+        features_dict["PathLevel"] = self.extract_path_level(url)
+        features_dict["NumDash"] = self.extract_num_dash(url)
+        features_dict["AtSymbol"] = self.extract_at_symbol(url)
+        features_dict["NumUnderscore"] = self.extract_num_underscore(url)
+        features_dict["NumHash"] = self.extract_num_hash(url)
+        features_dict["IpAddress"] = self.extract_ip_address(url)
+        features_dict["DomainInPaths"] = self.extract_domain_in_paths(url, self.tlds_filepath)
+        features_dict["HostnameLength"] = self.extract_hostname_length(url)
+        features_dict["QueryLength"] = self.extract_query_length(url)
+        features_dict["NumSensitiveWords"] = self.extract_num_sensitive_words(url)
+        features_dict["SubmitInfoToEmail"] = self.extract_submit_info_to_email(html_code)
+        features_dict["MissingTitle"] = self.extract_missing_title(html_code)
+
         return features_dict
     
     # ------------------------- Helper functions
