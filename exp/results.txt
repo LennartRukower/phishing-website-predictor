@@ -22,3 +22,210 @@ Training loss: 0.6918628811836243
 Validation accuracy: (0.64, 0.6415024412252857, 0.6405242354899106, 0.6395328345535813)
 Max loss: 0.7345888614654541, Min loss: 0.6648975014686584
 -------------------------------------
+Number of hidden layers: 2
+Batch size: 80
+Number of epochs: 1000
+Loss function: BCELoss
+Learning rate: 0.001
+Training loss: 0.4495271146297455
+Validation accuracy: (0.506, 0.253, 0.5, 0.33598937583001326)
+Max loss: 0.813488781452179, Min loss: 0.1645774245262146
+-------------------------------------
+Number of hidden layers: 2
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 0.0001
+Training loss: 0.3505318760871887
+Validation accuracy: (0.506, 0.253, 0.5, 0.33598937583001326)
+Max loss: 0.955802321434021, Min loss: 0.20197010040283203
+-------------------------------------
+Number of hidden layers: 2
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 0.0001
+Training loss: 0.161245197057724
+Validation accuracy: (0.506, 0.253, 0.5, 0.33598937583001326)
+Max loss: 1.1193573474884033, Min loss: 0.008376160636544228
+-------------------------------------
+Number of hidden layers: 3
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 1e-05
+Training loss: 0.0834549143910408
+Validation accuracy: (0.506, 0.253, 0.5, 0.33598937583001326)
+Max loss: 1.0076221227645874, Min loss: 0.029840966686606407
+-------------------------------------
+Number of hidden layers: 3
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 1e-05
+Training loss: 0.20137974619865417
+Validation accuracy: (0.506, 0.0, 0.0, 0.0)
+Max loss: 1.1043298244476318, Min loss: 0.029685670509934425
+-------------------------------------
+Number of hidden layers: 3
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 1e-05
+Training loss: 0.11868953704833984
+Validation accuracy: (0.506, 0.253, 0.5, 0.33598937583001326)
+Max loss: 1.0486280918121338, Min loss: 0.03332837298512459
+-------------------------------------
+Number of hidden layers: 3
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 1e-05
+Training loss: 0.07373876124620438
+Validation accuracy: (0.506, 0.253, 0.5, 0.33598937583001326)
+Max loss: 1.4629356861114502, Min loss: 0.029013728722929955
+-------------------------------------
+Number of hidden layers: 3
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 1e-05
+Training loss: 0.11091675609350204
+Validation accuracy: (0.506, 0.253, 0.5, 0.33598937583001326)
+Max loss: 0.9036703109741211, Min loss: 0.02375735715031624
+-------------------------------------
+Number of hidden layers: 3
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 1e-05
+Training loss: 0.28255483508110046
+Validation accuracy: (0.506, 0.253, 0.5, 0.33598937583001326)
+Max loss: 1.2472813129425049, Min loss: 0.03715939074754715
+-------------------------------------
+Number of hidden layers: 3
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 1e-05
+Training loss: 0.20260874927043915
+Validation accuracy: (0.506, 0.253, 0.5, 0.33598937583001326)
+Max loss: 1.0487085580825806, Min loss: 0.03370562568306923
+-------------------------------------
+Number of hidden layers: 1
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 1e-05
+Training loss: 0.14577579498291016
+Validation accuracy: (0.506, 0.253, 0.5, 0.33598937583001326)
+Max loss: 0.992445170879364, Min loss: 0.07938246428966522
+-------------------------------------
+Number of hidden layers: 1
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 0.001
+Training loss: 0.04473559930920601
+Validation accuracy: (0.506, 0.253, 0.5, 0.33598937583001326)
+Max loss: 0.8885722160339355, Min loss: 0.007262167986482382
+-------------------------------------
+Number of hidden layers: 1
+Batch size: 80
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 0.001
+Training loss: 0.08742495626211166
+Validation accuracy: 0.506
+Max loss: 2.6860246658325195, Min loss: 0.006989720277488232
+-------------------------------------
+Number of hidden layers: 2
+Batch size: 32
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 0.001
+Training loss: 0.0035998597741127014
+Validation accuracy: 0.506
+Max loss: 3.572162628173828, Min loss: 1.0136944617045174e-08
+-------------------------------------
+Number of hidden layers: 4
+Batch size: 32
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 0.001
+Training loss: 1.5051352875161683e-06
+Validation accuracy: 0.506
+Max loss: 3.623857021331787, Min loss: 7.926601156599237e-17
+-------------------------------------
+Number of hidden layers: 6
+Batch size: 32
+Number of epochs: 500
+Loss function: BCELoss
+Learning rate: 0.001
+Training loss: 0.00033078849082812667
+Validation accuracy: 0.506
+Max loss: 0.8944225907325745, Min loss: 7.397565786959603e-05
+-------------------------------------
+Number of hidden layers: 6
+Batch size: 32
+Number of epochs: 250
+Loss function: BCELoss
+Learning rate: 0.001
+Training loss: 0.001495331758633256
+Validation accuracy: 0.506
+Max loss: 0.7481510639190674, Min loss: 7.510074647143483e-05
+-------------------------------------
+Number of hidden layers: 6
+Batch size: 32
+Number of epochs: 250
+Loss function: BCELoss
+Learning rate: 0.001
+Training loss: 0.00031896872678771615
+Validation accuracy: 0.506
+Max loss: 0.7872743606567383, Min loss: 0.00017604015010874718
+-------------------------------------
+Number of hidden layers: 6
+Batch size: 32
+Number of epochs: 250
+Loss function: BCELoss
+Learning rate: 0.001
+Training loss: 0.0012361860135570168
+Validation accuracy: 0.506
+Max loss: 0.7947973012924194, Min loss: 0.00022528006229549646
+-------------------------------------
+Number of hidden layers: 6
+Batch size: 32
+Number of epochs: 250
+Loss function: BCELoss
+Learning rate: 0.001
+Training loss: 0.00019289004558231682
+Validation accuracy: 0.506
+Max loss: 0.7405174970626831, Min loss: 0.00011780395288951695
+-------------------------------------
+Number of hidden layers: 6
+Batch size: 64
+Number of epochs: 100
+Loss function: BCELoss
+Learning rate: 0.0001
+Training loss: 0.0007457025349140167
+Validation accuracy: 0.506
+Max loss: 1.7996753454208374, Min loss: 0.0006837067776359618
+-------------------------------------
+Number of hidden layers: 6
+Batch size: 64
+Number of epochs: 100
+Loss function: BCELoss
+Learning rate: 0.0001
+Training loss: 0.0035889423452317715
+Validation accuracy: 0.506
+Max loss: 1.6163111925125122, Min loss: 0.0006025256006978452
+-------------------------------------
+Number of hidden layers: 6
+Batch size: 64
+Number of epochs: 100
+Loss function: BCELoss
+Learning rate: 0.0001
+Training loss: 0.002795145148411393
+Validation accuracy: 0.506
+Max loss: 1.6621382236480713, Min loss: 0.0008617858402431011
+-------------------------------------
