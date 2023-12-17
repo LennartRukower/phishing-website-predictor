@@ -103,7 +103,7 @@ def create_FFNet():
     y = df["CLASS_LABEL"]
 
     # Create training, test and validation data
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.05, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
 
     from sklearn.preprocessing import StandardScaler
 
@@ -151,7 +151,7 @@ def create_FFNet():
     lr = 0.0001 # Learning rate
     optimizer = optim.Adam(net.parameters(), lr=lr) # Optimizer for backpropagation
     batch_size = 64
-    epochs = 100
+    epochs = 200
 
     from Trainer import Trainer
     trainer = Trainer(model=net, criterion=criterion, optimizer=optimizer)

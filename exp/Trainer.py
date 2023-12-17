@@ -39,7 +39,9 @@ class Trainer():
                 if self.criterion.__class__.__name__ == "CrossEntropyLoss":
                     loss = self.criterion(outputs, labels)
                 elif self.criterion.__class__.__name__ == "BCELoss":
-                    loss = self.criterion(outputs, labels.unsqueeze(1).type(torch.float))
+                    #print("DEBUG", outputs.shape, labels.shape)
+                    #print("DEBUG", outputs, labels)
+                    loss = self.criterion(outputs.squeeze(1), labels.type(torch.float))
                 losses.append(loss.item())
 
                 # Checks if the loss is below the stop criterion
@@ -63,12 +65,13 @@ class Trainer():
         all_labels = []
         self.model.eval()
         with torch.no_grad():
+            i = True
             for inputs, labels in self.val_loader:
                 outputs = self.model(inputs)
 
-                # Convert outputs to predicted class (argmax over the output probabilities)
-                preds = torch.argmax(outputs, dim=1)
-
+                # Get predictions
+                preds = torch.round(outputs.squeeze(1))
+                
                 # Store predictions and actual labels
                 all_preds.extend(preds.cpu().numpy())
                 all_labels.extend(labels.cpu().numpy())
