@@ -310,3 +310,12 @@ Training loss: 0.01059928722679615
 Validation accuracy: 0.937
 Max loss: 2.523050546646118, Min loss: 1.429697840649169e-05
 -------------------------------------
+Number of hidden layers: 6
+Batch size: 64
+Number of epochs: 200
+Loss function: BCELoss
+Learning rate: 0.0001
+Training loss: 0.003752976655960083
+Validation accuracy: 0.935
+Max loss: 2.5775532722473145, Min loss: 4.3012434616684914e-05
+-------------------------------------
