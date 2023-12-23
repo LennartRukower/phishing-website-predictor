@@ -1,7 +1,7 @@
-flask
-torch
-numpy
-pandas
-scikit-learn
-matplotlib
-seaborn
+flask # used for rest api
+torch # used for neural network model
+numpy # used for data manipulation
+pandas # used for data manipulation
+scikit-learn # used for data manipulation & training
+matplotlib # used for data visualization
+seaborn # used for data visualization
