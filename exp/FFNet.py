@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.init as init
 import torch
+import pickle
 
 class FFNet(nn.Module):
 
@@ -117,6 +118,10 @@ def create_FFNet():
     X_train = scaler.fit_transform(X_train)
     X_val = scaler.transform(X_val)
 
+    # Save the scaler
+    with open("./exp/scaler.pkl", "wb") as file:
+        pickle.dump(scaler, file)
+
     from torch.utils.data import TensorDataset
 
     # Convert to tensors
@@ -162,16 +167,16 @@ def create_FFNet():
     plt.show()
 
     accuracy, precision, recall, f1 = trainer.evaluate()
-    with open("./exp/results.txt", "a") as f:
-        f.write(f"Number of hidden layers: {len(hidden_sizes)}\n")
-        f.write(f"Batch size: {batch_size}\n")
-        f.write(f"Number of epochs: {epochs}\n")
-        f.write(f"Loss function: {criterion.__class__.__name__}\n")
-        f.write(f"Learning rate: {lr}\n")
-        f.write(f"Training loss: {losses[-1]}\n")
-        f.write(f"Validation accuracy: {accuracy}\n")
-        f.write(f"Max loss: {max(losses)}, Min loss: {min(losses)}\n")
-        f.write("-------------------------------------\n")
+    with open("./exp/results.txt", "a") as file:
+        file.write(f"Number of hidden layers: {len(hidden_sizes)}\n")
+        file.write(f"Batch size: {batch_size}\n")
+        file.write(f"Number of epochs: {epochs}\n")
+        file.write(f"Loss function: {criterion.__class__.__name__}\n")
+        file.write(f"Learning rate: {lr}\n")
+        file.write(f"Training loss: {losses[-1]}\n")
+        file.write(f"Validation accuracy: {accuracy}\n")
+        file.write(f"Max loss: {max(losses)}, Min loss: {min(losses)}\n")
+        file.write("-------------------------------------\n")
 
     # Save training results to file
     torch.save(net.state_dict(), "./exp/model.pt")
