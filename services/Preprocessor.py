@@ -1,11 +1,11 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import torch
-
+import pickle
 
 class Preprocessor:
 
-    def __init__(self, model_features, model_type):
+    def __init__(self, model_features, model_type, scaler_path=None):
         '''
         PARAMETERS:
         ------
@@ -14,7 +14,9 @@ class Preprocessor:
         self.model_features = model_features
         self.model_type = model_type
         if self.model_type == 'FFNet':
-            self.scaler = StandardScaler()
+            # Load the saved scaler
+            with open(scaler_path, 'rb') as file:
+                self.scaler = pickle.load(file)
 
     def create_encoded_features(self, features):
         if self.model_type == 'FFNet':
@@ -25,42 +27,102 @@ class Preprocessor:
     def create_encoded_features_FFNet(self, features):
         # Transform features into a pandas dataframe
         df = pd.DataFrame(features, index=[0])
+        print("Dataframe:", df)
         # Encode features
         df = df.replace({True: 1, False: 0})
         df = df.replace('10.000.000.000', 1.0)
-
+        
+        # Remove features that are not in the model
+        df = self.remove_features(df)
+        print("Dataframe after removing features:", df)
         # Scale the features
         df = self.scale_features(df)
+        print("Dataframe after scaling features:", df)
         # Convert to tensor
-        tensor = torch.FloatTensor(df.values)
+        tensor = torch.FloatTensor(df)
+        print("Tensor:", tensor)
 
         return tensor
     
     def scale_features(self, df):
         # Scale the features
-        df = self.scaler.fit_transform(df)
+        df = self.scaler.transform(df)
         return df
 
     def remove_features(self, df):
         return df[self.model_features]
 
-model_features = [
-    "SubdomainLevel",
-    "UrlLength",
-    "NumDashInHostname",
-    "TildeSymbol",
-    "NumPercent",
-    "NumAmpersand",
-    "NumNumericChars",
-    "DomainInSubdomains",
-    "HttpsInHostname",
-    "PathLength",
-    "DoubleSlashInPath",
-    "PctExtResourceUrls",
-    "InsecureForms",
-    "ExtFormAction",
-    "PopUpWindow",
-    "IframeOrFrame",
-    "ImagesOnlyInForm",
-]
-preprocessor = Preprocessor(model_features=model_features, model_type='FFNet')
+def test_preprocessor():
+
+    model_features = [
+        "NumDots",
+        "SubdomainLevel",
+        "PathLevel",    
+        "UrlLength",
+        "NumDash",
+        "NumDashInHostname",
+        "AtSymbol",
+        "TildeSymbol",
+        "NumUnderscore",
+        "NumPercent",
+        "NumQueryComponents",
+        "NumAmpersand",
+        "NumHash",
+        "NumNumericChars",
+        "IpAddress",
+        "DomainInSubdomains",
+        "DomainInPaths",
+        "HttpsInHostname",
+        "HostnameLength",
+        "PathLength",
+        "QueryLength",
+        "DoubleSlashInPath",
+        "NumSensitiveWords",
+        "PctExtResourceUrls",
+        "InsecureForms",
+        "ExtFormAction",
+        "PopUpWindow",
+        "SubmitInfoToEmail",
+        "IframeOrFrame",
+        "MissingTitle",
+        "ImagesOnlyInForm",
+    ]
+    preprocessor = Preprocessor(model_features=model_features, model_type='FFNet', scaler_path='./exp/scaler.pkl')
+    features = {
+        "NumDots": 5,
+        "SubdomainLevel": 2,
+        "PathLevel": 2,
+        "UrlLength": 123,
+        "NumDash": 3,
+        "NumDashInHostname": 1,
+        "AtSymbol": True,
+        "TildeSymbol": False,
+        "NumUnderscore": 1,
+        "NumPercent": 0,
+        "NumQueryComponents": 2,
+        "NumAmpersand": 0,
+        "NumHash": 0,
+        "NumNumericChars": 2,
+        "IpAddress": False,
+        "DomainInSubdomains": True,
+        "DomainInPaths": False,
+        "HttpsInHostname": True,
+        "HostnameLength": 6,
+        "PathLength": 5,
+        "QueryLength": 12,
+        "DoubleSlashInPath": False,
+        "NumSensitiveWords": 2,
+        "PctExtResourceUrls": 0.2,
+        "InsecureForms": True,
+        "ExtFormAction": True,
+        "PopUpWindow": True,
+        "SubmitInfoToEmail": False,
+        "IframeOrFrame": False,
+        "MissingTitle": False,
+        "ImagesOnlyInForm": False,
+        "test": False
+    }
+    preprocessor.create_encoded_features(features)
+
+if __name__ == "__main__":
+    test_preprocessor()
