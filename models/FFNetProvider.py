@@ -26,7 +26,4 @@ class FFNetProvider():
         self.model.load(self.model_path)
     
     def predict(self, features):
-        output = self.model.predict(features)
-        pred = torch.round(output.squeeze(1))
-        return pred
-
+        return self.model.predict(features)

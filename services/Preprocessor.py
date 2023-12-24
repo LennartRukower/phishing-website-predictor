@@ -27,20 +27,16 @@ class Preprocessor:
     def create_encoded_features_FFNet(self, features):
         # Transform features into a pandas dataframe
         df = pd.DataFrame(features, index=[0])
-        print("Dataframe:", df)
         # Encode features
         df = df.replace({True: 1, False: 0})
         df = df.replace('10.000.000.000', 1.0)
         
         # Remove features that are not in the model
         df = self.remove_features(df)
-        print("Dataframe after removing features:", df)
         # Scale the features
         df = self.scale_features(df)
-        print("Dataframe after scaling features:", df)
         # Convert to tensor
         tensor = torch.FloatTensor(df)
-        print("Tensor:", tensor)
 
         return tensor
     

@@ -20,6 +20,8 @@ class ConfigLoader:
                 json.dump(self.config, file, indent=4)
 
     def get_config(self):
+        if self.config is None:
+            raise Exception("Config not loaded")
         return self.config
 
 if __name__ == "__main__":

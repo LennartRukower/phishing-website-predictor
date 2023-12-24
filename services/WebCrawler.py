@@ -19,7 +19,7 @@ class WebCrawler:
         '''
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
             response.raise_for_status()  # Raise an HTTPError if the HTTP request returned an unsuccessful status code
             return response.text
         except requests.exceptions.RequestException as e:

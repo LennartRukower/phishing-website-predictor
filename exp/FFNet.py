@@ -53,106 +53,14 @@ class FFNet(nn.Module):
         if self.activation_functions[-1] == "Sigmoid":
             x = torch.sigmoid(x)
         return x
-
-
-def create_FFNet():
-    # >>>>>> PREPARE DATA
-    import pandas as pd
-    import numpy as np
-    from sklearn.preprocessing import LabelEncoder
-    from sklearn.model_selection import train_test_split
-
-    # Read data from csv file
-    df = pd.read_csv(filepath_or_buffer="./exp/dataset.csv", sep=";")
-
-    # Load config
-    config_loader = ConfigLoader("./config.json")
-    config = config_loader.get_config()
-    model_features = config["ffnn"]["model_features"]
-
-    df = df.replace('10.000.000.000', 1.0)
-    # Split data into features and targets
-    X = df.drop(["id", "CLASS_LABEL"], axis=1)
-    X = X[model_features]
-    y = df["CLASS_LABEL"]
-
-    # Create training, test and validation data
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
-
-    from sklearn.preprocessing import StandardScaler
-
-    # Encode labels
-    le = LabelEncoder()
-    y_train = le.fit_transform(y_train)
-    y_val = le.transform(y_val)
-
-    # Scale the features 
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_val = scaler.transform(X_val)
-
-    # Save the scaler
-    with open("./exp/scaler.pkl", "wb") as file:
-        pickle.dump(scaler, file)
-
-    from torch.utils.data import TensorDataset
-
-    # Convert to tensors
-    X_train, y_train = torch.tensor(X_train, dtype=torch.float32), torch.tensor(y_train, dtype=torch.long)
-    X_val, y_val = torch.tensor(X_val, dtype=torch.float32), torch.tensor(y_val, dtype=torch.long)
-
-    # Create datasets
-    train_dataset = TensorDataset(X_train, y_train)
-    val_dataset = TensorDataset(X_val, y_val)
-
-    # >>>>>> INIT MODEL
-    config = {
-        "input": len(model_features),
-        "output": 1,
-        "hidden": [64, 80, 126, 80, 64, 32],
-        "activations": ["ReLU", "ReLU", "ReLU", "ReLU","ReLU", "ReLU", "Sigmoid"],
-        "dropout_positions": [],
-        "dropout_probs": [],
-    }
-    input_size = config['input']
-    hidden_sizes = config['hidden']
-    output_size = config['output']
-    activations = config["activations"]
-    net = FFNet(input_size, hidden_sizes, output_size, activations)
-
-    # Print model summary
-    print(net)
-
-    # >>>>>> TRAIN MODEL
-    import torch.optim as optim
-    criterion = nn.BCELoss() # Loss function
-    lr = 0.0001 # Learning rate
-    optimizer = optim.Adam(net.parameters(), lr=lr) # Optimizer for backpropagation
-    batch_size = 64
-    epochs = 200
-
-    from Trainer import Trainer
-    trainer = Trainer(model=net, criterion=criterion, optimizer=optimizer)
-    trainer.load_data(train_dataset, val_dataset, batch_size=batch_size)
-    losses = trainer.train(num_epochs=epochs)
-    import matplotlib.pyplot as plt
-    plt.plot(losses)
-    plt.show()
-
-    accuracy, precision, recall, f1 = trainer.evaluate()
-    with open("./exp/results.txt", "a") as file:
-        file.write(f"Number of hidden layers: {len(hidden_sizes)}\n")
-        file.write(f"Batch size: {batch_size}\n")
-        file.write(f"Number of epochs: {epochs}\n")
-        file.write(f"Loss function: {criterion.__class__.__name__}\n")
-        file.write(f"Learning rate: {lr}\n")
-        file.write(f"Training loss: {losses[-1]}\n")
-        file.write(f"Validation accuracy: {accuracy}\n")
-        file.write(f"Max loss: {max(losses)}, Min loss: {min(losses)}\n")
-        file.write("-------------------------------------\n")
-
-    # Save training results to file
-    torch.save(net.state_dict(), "./exp/model.pt")
-
-if __name__ == "__main__":
-    create_FFNet()
+    
+    def predict(self, features):
+        output = self.forward(features)
+        pred = torch.round(output.squeeze(1))
+        pred = pred.item()
+        print("OUTPUT", pred)
+        return pred
+    
+    def load(self, model_path):
+        self.load_state_dict(torch.load(model_path))
+        self.eval()
