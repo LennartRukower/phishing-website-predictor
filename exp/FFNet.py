@@ -3,6 +3,7 @@ import torch.nn.functional as F
 import torch.nn.init as init
 import torch
 import pickle
+from config.ConfigLoader import ConfigLoader
 
 class FFNet(nn.Module):
 
@@ -64,39 +65,11 @@ def create_FFNet():
     # Read data from csv file
     df = pd.read_csv(filepath_or_buffer="./exp/dataset.csv", sep=";")
 
-    model_features = [
-        "NumDots",
-        "SubdomainLevel",
-        "PathLevel",    
-        "UrlLength",
-        "NumDash",
-        "NumDashInHostname",
-        "AtSymbol",
-        "TildeSymbol",
-        "NumUnderscore",
-        "NumPercent",
-        "NumQueryComponents",
-        "NumAmpersand",
-        "NumHash",
-        "NumNumericChars",
-        "IpAddress",
-        "DomainInSubdomains",
-        "DomainInPaths",
-        "HttpsInHostname",
-        "HostnameLength",
-        "PathLength",
-        "QueryLength",
-        "DoubleSlashInPath",
-        "NumSensitiveWords",
-        "PctExtResourceUrls",
-        "InsecureForms",
-        "ExtFormAction",
-        "PopUpWindow",
-        "SubmitInfoToEmail",
-        "IframeOrFrame",
-        "MissingTitle",
-        "ImagesOnlyInForm",
-    ]
+    # Load config
+    config_loader = ConfigLoader("./config.json")
+    config = config_loader.get_config()
+    model_features = config["ffnn"]["model_features"]
+
     df = df.replace('10.000.000.000', 1.0)
     # Split data into features and targets
     X = df.drop(["id", "CLASS_LABEL"], axis=1)
