@@ -1,4 +1,3 @@
 flask
-urllib.parse
 beautifulsoup4
 tldextract
