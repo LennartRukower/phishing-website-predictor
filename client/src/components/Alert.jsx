@@ -1,8 +1,7 @@
-// Alert is a div that has a rounded border with a given color and a given message. The message is centered in the div
-
 import React from 'react';
 
 function Alert({color, message}) {
+
     function getColor(color) {
         switch (color) {
             case 'red':
@@ -13,8 +12,9 @@ function Alert({color, message}) {
                 return 'border-blue-400 text-blue-700';
         }
     }
+
     return (
-        <div className={`border ${getColor(color)} px-4 py-5 rounded relative flex items-center justify-center`} role="alert">
+        <div className={`border ${getColor(color)} bg-white px-4 py-5 rounded relative flex items-center justify-center`} role="alert">
             <p>{message}</p>
         </div>
     );

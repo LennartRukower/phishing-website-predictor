@@ -2,9 +2,9 @@
 
 import React from 'react';
 
-function Form({children, action, onError}) {
+function Form({children, onSubmit, onError}) {
     return (
-        <form action={action} onError={onError}>
+        <form onSubmit={onSubmit} onError={onError}>
             {children}
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">Submit</button>
         </form>
