@@ -1,4 +1,38 @@
 {
+    "rf": {
+        "model_features": [
+            "NumDots",
+            "SubdomainLevel",
+            "PathLevel",
+            "UrlLength",
+            "NumDash",
+            "NumDashInHostname",
+            "AtSymbol",
+            "TildeSymbol",
+            "NumUnderscore",
+            "NumPercent",
+            "NumAmpersand",
+            "NumHash",
+            "NumNumericChars",
+            "IpAddress",
+            "DomainInPaths",
+            "HttpsInHostname",
+            "HostnameLength",
+            "PathLength",
+            "QueryLength",
+            "DoubleSlashInPath",
+            "NumSensitiveWords",
+            "InsecureForms",
+            "ExtFormAction",
+            "PopUpWindow",
+            "SubmitInfoToEmail",
+            "IframeOrFrame",
+            "MissingTitle",
+            "ImagesOnlyInForm"
+        ],
+        "model_config": {},
+        "training_config": {}
+    },
     "ffnn": {
         "model_features": [
             "NumDots",

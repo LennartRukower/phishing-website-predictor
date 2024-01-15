@@ -1,5 +1,5 @@
 from exp.FFNet import FFNet
-import torch
+from config.ConfigLoader import ConfigLoader
 
 class FFNetProvider():
 
@@ -13,16 +13,12 @@ class FFNetProvider():
         if (self.model is not None):
             print("Model already loaded")
             return
-        config = {
-            "input": self.model_features_size,
-            "output": 1,
-            "hidden": [64, 80, 126, 80, 64, 32],
-            "activations": ["ReLU", "ReLU", "ReLU", "ReLU","ReLU", "ReLU", "Sigmoid"],
-            "dropout_positions": [],
-            "dropout_probs": [],
-        }
+        config_loader = ConfigLoader("./config/config.json")
+        config_loader.load()
+        model_config = config_loader.get_config()["ffnn"]["model_config"]
         
-        self.model = FFNet(config['input'], config['hidden'], config['output'], config["activations"], config["dropout_positions"], config["dropout_probs"])
+        
+        self.model = FFNet(model_config['input'], model_config['hidden'], model_config['output'], model_config["activations"], model_config["dropout_positions"], model_config["dropout_probs"])
         self.model.load(self.model_path)
     
     def predict(self, features):

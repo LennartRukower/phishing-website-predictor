@@ -33,12 +33,14 @@ def predict_url():
     if (html.startswith("Error")):
         return {"error": html}
 
+    # TODO: Make the model usage more generic
+
     # Load config
-    config_loader = ConfigLoader("./config/config.json")
+    config_loader = ConfigLoader(f'exp/models/{model}/2024-01-15/config.json')
     config_loader.load()
     config = config_loader.get_config()
     model_features = config[model]["model_features"]
-    model_folder_path = "exp/models/2023-12-24_3"
+    model_folder_path = f'exp/models/{model}/2024-01-15'
 
     extractor = Extractor()
     extracted_features = extractor.extract_features(url, html)
