@@ -5,7 +5,7 @@ import pickle
 
 class Preprocessor:
 
-    def __init__(self, model_features, model_type, scaler_path=None):
+    def __init__(self, model_features, model_type, scaler_path):
         '''
         PARAMETERS:
         ------
@@ -13,14 +13,16 @@ class Preprocessor:
         '''
         self.model_features = model_features
         self.model_type = model_type
-        if self.model_type == 'FFNet':
-            # Load the saved scaler
-            with open(scaler_path, 'rb') as file:
-                self.scaler = pickle.load(file)
+    
+        # Load the saved scaler
+        with open(scaler_path, 'rb') as file:
+            self.scaler = pickle.load(file)
 
     def create_encoded_features(self, features):
-        if self.model_type == 'FFNet':
+        if self.model_type == 'ffnn':
             return self.create_encoded_features_FFNet(features)
+        elif self.model_type == 'rf':
+            return self.create_encoded_features_RF(features)
         else:
             raise Exception('Model type not supported')
     
@@ -39,6 +41,21 @@ class Preprocessor:
         tensor = torch.FloatTensor(df)
 
         return tensor
+    
+    def create_encoded_features_RF(self, features):
+        # Transform features into a pandas dataframe
+        df = pd.DataFrame(features, index=[0])
+        # Encode features
+        df = df.replace({True: 1, False: 0})
+        df = df.replace('10.000.000.000', 1.0)
+
+        # Remove features that are not in the model
+        df = self.remove_features(df)
+
+        # Scale the features
+        df = self.scale_features(df)
+
+        return df
     
     def scale_features(self, df):
         # Scale the features

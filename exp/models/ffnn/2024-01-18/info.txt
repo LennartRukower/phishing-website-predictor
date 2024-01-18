@@ -1,0 +1,10 @@
+Number of hidden layers: 6
+Batch size: 32
+Number of epochs: 100
+Loss function: BCELoss
+Learning rate: 0.001
+Training loss: 0.0003109496901743114
+Accuracy: 0.926
+Precision: 0.9259810511490942
+Recall: 0.9259810511490942
+F1: 0.9259810511490942

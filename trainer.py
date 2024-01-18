@@ -67,15 +67,17 @@ def train_rf():
     import datetime
     import pickle
     now = datetime.datetime.now()
-    folder_name = now.strftime("%Y-%m-%d")
-    folder_path = os.path.join("./exp/models/rf", folder_name)
-    # Check if the folder already exists
+    model_version = now.strftime("%Y-%m-%d")
+    folder_path = os.path.join("./exp/models/rf", model_version)
+    # Check if the folder (and therefore the version) already exists
     if os.path.exists(folder_path):
-        # Append a number to the folder name
+        # Append a number to the model version
         i = 1
         while os.path.exists(os.path.join(folder_path + f"_{i}")):
             i += 1
-        folder_path = folder_path + f"_{i}"
+        model_version = model_version + f"_{i}"
+        folder_path = os.path.join("./exp/models/rf", model_version)
+
     os.mkdir(folder_path)
 
     # Save specific training config and results to file
@@ -87,6 +89,9 @@ def train_rf():
         file.write(f"Recall: {recall}\n")
         file.write(f"F1: {f1}\n")
     
+    # Update model version in config
+    config["rf"]["model_version"] = model_version
+
     # Save the used config
     with open(os.path.join(folder_path, "config.json"), "w") as file:
         json.dump(config, file, indent=4)
@@ -185,15 +190,17 @@ def train_ffnn():
 
     # Create new folder for the model
     now = datetime.datetime.now()
-    folder_name = now.strftime("%Y-%m-%d")
-    folder_path = os.path.join("./exp/models/ffnn", folder_name)
-    # Check if the folder already exists
+    model_version = now.strftime("%Y-%m-%d")
+    folder_path = os.path.join("./exp/models/ffnn", model_version)
+    # Check if the folder (and therefore the version) already exists
     if os.path.exists(folder_path):
-        # Append a number to the folder name
+        # Append a number to the model version
         i = 1
         while os.path.exists(os.path.join(folder_path + f"_{i}")):
             i += 1
-        folder_path = folder_path + f"_{i}"    
+        model_version = model_version + f"_{i}"
+        folder_path = os.path.join("./exp/models/ffnn", model_version)
+
     os.mkdir(folder_path)
 
 
@@ -209,7 +216,10 @@ def train_ffnn():
         file.write(f"Precision: {precision}\n")
         file.write(f"Recall: {recall}\n")
         file.write(f"F1: {f1}\n")
-    
+
+    # Update model version in config
+    config["ffnn"]["model_version"] = model_version
+
     # Save the used config
     with open(os.path.join(folder_path, "config.json"), "w") as file:
         json.dump(config, file, indent=4)
