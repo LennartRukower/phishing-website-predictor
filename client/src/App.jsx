@@ -52,8 +52,8 @@ function App() {
     <div className="mx-auto w-2/4 mt-20">
         <Card title="Phishing URL Predictor" content={
           <Form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Enter a url" className="border border-gray-400 p-2 w-full"/>
-            <select className="border border-gray-400 p-2 w-full">
+            <input type="text" placeholder="Enter a url" className="border border-gray-400 p-2 w-full rounded mb-1"/>
+            <select className="border border-gray-400 p-2 w-full rounded mb-1">
               {models.map(model => <option value={model}>{model}</option>)}
             </select>
           </Form>
