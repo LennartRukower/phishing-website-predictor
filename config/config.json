@@ -31,7 +31,11 @@
             "MissingTitle",
             "ImagesOnlyInForm"
         ],
-        "model_config": {},
+        "model_config": {
+            "nEstimators": 100,
+            "maxDepth": -1,
+            "minSamplesSplit": 2
+        },
         "training_config": {}
     },
     "ffnn": {

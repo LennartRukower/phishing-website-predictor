@@ -19,8 +19,8 @@ def train_rf():
 
     # TODO: Use config
     model_features = config["rf"]["model_features"]
-    model_config = config["ffnn"]["model_config"]
-    training_config = config["ffnn"]["training_config"]
+    model_config = config["rf"]["model_config"]
+    training_config = config["rf"]["training_config"]
 
     df = df.replace('10.000.000.000', 1.0)
     # Split data into features and targets
@@ -42,7 +42,10 @@ def train_rf():
     X_val = scaler.transform(X_val)
 
     # >>>>>> INIT MODEL
-    rf = RandomForestClassifier()
+    n_estimators = model_config["nEstimators"]
+    max_depth = model_config["maxDepth"] if model_config["maxDepth"] != -1 else None
+    min_samples_split = model_config["minSamplesSplit"]
+    rf = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, min_samples_split=min_samples_split)
     # >>>>>> TRAIN MODEL
     rf.fit(X_train, y_train)
     y_pred = rf.predict(X_val)
