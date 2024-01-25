@@ -8,6 +8,8 @@ function Alert({color, message}) {
                 return 'border-red-400 text-red-700';
             case 'green':
                 return 'border-green-400 text-green-700';
+            case 'orange':
+                return 'border-orange-400 text-orange-700';
             default:
                 return 'border-blue-400 text-blue-700';
         }
