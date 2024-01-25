@@ -43,9 +43,9 @@ function App() {
             case "success":
                 const successMessage = generateSuccessMessage();
                 if (result.pred === 1) {
-                    return <Alert color="red" message={successMessage} />;
+                    return <Alert color="red" message={successMessage} showDetails />;
                 }
-                return <Alert color="green" message={successMessage} />;
+                return <Alert color="green" message={successMessage} showDetails />;
             default:
                 return null;
         }
@@ -75,7 +75,7 @@ function App() {
     }
 
     return (
-        <div className="mx-auto w-2/4 mt-20">
+        <div className="mx-auto w-1/2 mt-20">
             <div className="flex flex-row justify-center">
                 <p className="text-gray-400">Select a model</p>
             </div>
@@ -94,7 +94,7 @@ function App() {
                 <p className="text-gray-400">Enter a URL</p>
             </div>
             <div className="flex justify-center">
-                <div className="w-1/2">
+                <div className="w-2/3">
                     <Card
                         content={
                             <div className="flex flex-row justify-center w-full">
@@ -118,7 +118,9 @@ function App() {
             <div className="flex flex-row justify-center">
                 <p className="text-gray-400">The result is displayed here</p>
             </div>
-            {renderAlert()}
+            <div className="flex justify-center">
+                <div className="w-2/3">{renderAlert()}</div>
+            </div>
         </div>
     );
 }

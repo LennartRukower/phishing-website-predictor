@@ -43,7 +43,9 @@ function ModelCard({ model, selectedModel, setSelectedModel }) {
                 }
                 clickable
                 isSelected={model.name === selectedModel}
-                onClick={() => setSelectedModel(model.name)}
+                onClick={(event) => {
+                    setSelectedModel(model.name);
+                }}
             />
         </div>
     );

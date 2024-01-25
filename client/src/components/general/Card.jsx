@@ -10,10 +10,42 @@ function Card({ title, content, clickable, isSelected, onClick }) {
         }
         return "bg-white shadow-md rounded-lg p-4";
     }
+
+    function handleButtonClick(event) {
+        event.stopPropagation(); // Stop event propagation
+        console.log(`Clicked ${title}`);
+    }
+
     return (
-        <div className={getStyle()} onClick={onClick}>
+        <div id="card" className={getStyle()} onClick={onClick}>
             {title ? (
-                <h2 className="text-lg font-semibold mb-2 h-14 overflow-hidden">{title}</h2>
+                <div>
+                    <div className="flex justify-between items-start">
+                        <h2 className="text-lg font-semibold mb-2 h-14 overflow-hidden">{title}</h2>
+                        {/* Icon button */}
+                        {/* TODO: Add correct button styling and icon */}
+                        <button
+                            id="button"
+                            className="hover:cursor-pointer"
+                            onClick={handleButtonClick}
+                        >
+                            <svg
+                                className="w-6 h-6 text-gray-500 hover:text-purple-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M12 4v2m0 6h.01m-6.938 4.938a9 9 0 1112.728 0M12 14v4"
+                                ></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
             ) : null}
             {content}
         </div>
