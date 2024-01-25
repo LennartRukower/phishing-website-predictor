@@ -69,7 +69,6 @@ def predict_url():
         pred = provider.predict(features)
     
     result = {"url": url, "model": model, "html": html, "ex_fet": extracted_features, "pred": pred}
-    print(result)
     return result
 
 
