@@ -6,6 +6,7 @@ class ConfigLoader:
         self.config = None
 
     def load(self):
+        print("Loading config", self.config_file)
         with open(self.config_file, 'r') as f:
             self.config = json.load(f)
             # Count the number of model features
@@ -18,7 +19,7 @@ class ConfigLoader:
              # Write the updated config back to the JSON file
             with open(self.config_file, 'w') as file:
                 json.dump(self.config, file, indent=4)
-
+    
     def get_config(self):
         if self.config is None:
             raise Exception("Config not loaded")

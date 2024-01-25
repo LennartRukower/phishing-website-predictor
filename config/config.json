@@ -1,5 +1,45 @@
 {
+    "rf": {
+        "model_version": "2024-01-18",
+        "model_features": [
+            "NumDots",
+            "SubdomainLevel",
+            "PathLevel",
+            "UrlLength",
+            "NumDash",
+            "NumDashInHostname",
+            "AtSymbol",
+            "TildeSymbol",
+            "NumUnderscore",
+            "NumPercent",
+            "NumAmpersand",
+            "NumHash",
+            "NumNumericChars",
+            "IpAddress",
+            "DomainInPaths",
+            "HttpsInHostname",
+            "HostnameLength",
+            "PathLength",
+            "QueryLength",
+            "DoubleSlashInPath",
+            "NumSensitiveWords",
+            "InsecureForms",
+            "ExtFormAction",
+            "PopUpWindow",
+            "SubmitInfoToEmail",
+            "IframeOrFrame",
+            "MissingTitle",
+            "ImagesOnlyInForm"
+        ],
+        "model_config": {
+            "nEstimators": 100,
+            "maxDepth": -1,
+            "minSamplesSplit": 2
+        },
+        "training_config": {}
+    },
     "ffnn": {
+        "model_version": "2024-01-15",
         "model_features": [
             "NumDots",
             "SubdomainLevel",
