@@ -12,10 +12,12 @@ function Form({ children, onSubmit, onError, disabledSubmit }) {
 
     return (
         <form className="w-full" onSubmit={onSubmit} onError={onError}>
-            {children}
-            <button className={getStyle()} type="submit" disabled={disabledSubmit}>
-                Submit
-            </button>
+            <div>{children}</div>
+            <div className="flex flex-row justify-center">
+                <button className={getStyle()} type="submit" disabled={disabledSubmit}>
+                    Submit
+                </button>
+            </div>
         </form>
     );
 }

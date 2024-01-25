@@ -25,7 +25,11 @@ function App() {
 
     function generateSuccessMessage() {
         const prediction = result.pred === 1 ? "phishing" : "legitimate";
-        return `The url is a ${prediction} website!`;
+        return (
+            <p>
+                The url is a <strong>{prediction}</strong> website!
+            </p>
+        );
     }
 
     function renderAlert() {
@@ -72,7 +76,9 @@ function App() {
 
     return (
         <div className="mx-auto w-2/4 mt-20">
-            {/* TODO: Add grid and justify center the cards */}
+            <div className="flex flex-row justify-center">
+                <p className="text-gray-400">Select a model</p>
+            </div>
             <div className="flex flex-row justify-center">
                 {models.map((mod) => (
                     <ModelCard
@@ -84,10 +90,12 @@ function App() {
                 ))}
             </div>
             <br />
+            <div className="flex flex-row justify-center">
+                <p className="text-gray-400">Enter a URL</p>
+            </div>
             <div className="flex justify-center">
                 <div className="w-1/2">
                     <Card
-                        title="Phishing URL Predictor"
                         content={
                             <div className="flex flex-row justify-center w-full">
                                 <Form
@@ -96,7 +104,7 @@ function App() {
                                 >
                                     <input
                                         type="text"
-                                        placeholder="Enter a url"
+                                        placeholder="URL"
                                         className="border border-gray-400 p-2 w-full rounded mb-1"
                                         onChange={(event) => setUrl(event.target.value)}
                                     />
@@ -107,6 +115,9 @@ function App() {
                 </div>
             </div>
             <br />
+            <div className="flex flex-row justify-center">
+                <p className="text-gray-400">The result is displayed here</p>
+            </div>
             {renderAlert()}
         </div>
     );

@@ -12,7 +12,9 @@ function Card({ title, content, clickable, isSelected, onClick }) {
     }
     return (
         <div className={getStyle()} onClick={onClick}>
-            <h2 className="text-lg font-semibold mb-2 h-14 overflow-hidden">{title}</h2>
+            {title ? (
+                <h2 className="text-lg font-semibold mb-2 h-14 overflow-hidden">{title}</h2>
+            ) : null}
             {content}
         </div>
     );

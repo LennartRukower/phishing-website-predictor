@@ -30,7 +30,7 @@ function ModelCard({ model, selectedModel, setSelectedModel }) {
                 content={
                     <div>
                         <hr className="my-2" />
-                        <p>{model.description}</p>
+                        <p className="h-20 overflow-hidden">{model.description}</p>
                         {model.stats ? (
                             <ul className="list-disc list-inside">
                                 {getStatItem("Accuracy", model.stats.accuracy)}
