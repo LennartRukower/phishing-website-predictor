@@ -11,11 +11,25 @@ function App() {
 
   const [selectedModel, setSelectedModel] = useState(null);
   const [url, setUrl] = useState("");
+
+  const generateModelName = (model) => {
+    switch (model) {
+      case "rf":
+        return "Random Forest";
+      case "ffnn":
+        return "Feed Forward Neural Network";
+      default:
+        return "Unknown";
+    }
+  }
   
   useEffect(() => {
     fetch("http://127.0.0.1:5000/models")
       .then(res => res.json())
-      .then(data => setModels(data))
+      .then(data => {
+        if (data.error) throw Error(data.error);
+        setModels(data)
+      })
       .catch(err => console.log(err));
   }, []);
 
@@ -74,7 +88,7 @@ function App() {
             onChange={event => setUrl(event.target.value)}
             />
             <select className="border border-gray-400 p-2 w-full rounded mb-1" onChange={event => setSelectedModel(event.target.value)}>
-              {models.map(model => <option value={model}>{model}</option>)}
+              {models.map(model => <option value={model}>{generateModelName(model)}</option>)}
             </select>
           </Form>
         } />
