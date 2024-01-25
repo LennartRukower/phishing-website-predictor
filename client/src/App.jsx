@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import Alert from "./components/Alert";
-import Card from "./components/Card";
-import Form from "./components/Form";
+import Alert from "./components/general/Alert";
+import Card from "./components/general/Card";
+import Form from "./components/general/Form";
+import ModelCard from "./components/ModelCard";
 
 function App() {
     const [models, setModels] = useState([]);
@@ -11,17 +12,6 @@ function App() {
 
     const [selectedModel, setSelectedModel] = useState(null);
     const [url, setUrl] = useState("");
-
-    const generateModelName = (model) => {
-        switch (model) {
-            case "rf":
-                return "Random Forest";
-            case "ffnn":
-                return "Feed Forward Neural Network";
-            default:
-                return "Unknown";
-        }
-    };
 
     useEffect(() => {
         fetch("http://127.0.0.1:5000/models")
@@ -85,30 +75,37 @@ function App() {
             {/* TODO: Add grid and justify center the cards */}
             <div className="flex flex-row justify-center">
                 {models.map((mod) => (
-                    <div className="w-1/4 m-1">
-                        <Card
-                            title={generateModelName(mod)}
-                            content={mod}
-                            clickable
-                            isSelected={mod === selectedModel}
-                            onClick={() => setSelectedModel(mod)}
-                        />
-                    </div>
+                    <ModelCard
+                        key={mod.name}
+                        model={mod}
+                        selectedModel={selectedModel}
+                        setSelectedModel={setSelectedModel}
+                    />
                 ))}
             </div>
-            <Card
-                title="Phishing URL Predictor"
-                content={
-                    <Form onSubmit={handleSubmit}>
-                        <input
-                            type="text"
-                            placeholder="Enter a url"
-                            className="border border-gray-400 p-2 w-full rounded mb-1"
-                            onChange={(event) => setUrl(event.target.value)}
-                        />
-                    </Form>
-                }
-            />
+            <br />
+            <div className="flex justify-center">
+                <div className="w-1/2">
+                    <Card
+                        title="Phishing URL Predictor"
+                        content={
+                            <div className="flex flex-row justify-center w-full">
+                                <Form
+                                    onSubmit={handleSubmit}
+                                    disabledSubmit={selectedModel === null || url === ""}
+                                >
+                                    <input
+                                        type="text"
+                                        placeholder="Enter a url"
+                                        className="border border-gray-400 p-2 w-full rounded mb-1"
+                                        onChange={(event) => setUrl(event.target.value)}
+                                    />
+                                </Form>
+                            </div>
+                        }
+                    />
+                </div>
+            </div>
             <br />
             {renderAlert()}
         </div>
