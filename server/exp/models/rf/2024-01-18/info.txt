@@ -1,6 +1,0 @@
-Number of trees: 100
-Max depth: None
-Training accuracy: 0.94
-Precision: 0.9285714285714286
-Recall: 0.9512195121951219
-F1: 0.9397590361445782
