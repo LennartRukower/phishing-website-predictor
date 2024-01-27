@@ -5,6 +5,7 @@ import Form from "./components/general/Form";
 import ModelCard from "./components/ModelCard";
 import ModelInfoPopUp from "./components/ModelInfoPopUp";
 import ResultDetailsPopUp from "./components/ResultDetailsPopUp";
+import ParallelCoordinatesChart from "./components/general/ParallelCoordinates";
 
 function App() {
     const [models, setModels] = useState([]);
@@ -107,55 +108,57 @@ function App() {
     }
 
     return (
-        <div className="mx-auto w-1/2 mt-20">
-            <div className="flex flex-row justify-center">
-                <p className="text-gray-400">Select a model</p>
-            </div>
-            <div className="flex flex-row justify-center">
-                {models.map((mod) => (
-                    <ModelCard
-                        key={mod.name}
-                        model={mod}
-                        selectedModel={selectedModel}
-                        setSelectedModel={setSelectedModel}
-                        handleModelInfoOpen={() => {
-                            setModelInfo(mod);
-                            setModelInfoOpen(true);
-                        }}
-                    />
-                ))}
-            </div>
-            <br />
-            <div className="flex flex-row justify-center">
-                <p className="text-gray-400">Enter a URL</p>
-            </div>
-            <div className="flex justify-center">
-                <div className="w-2/3">
-                    <Card
-                        content={
-                            <div className="flex flex-row justify-center w-full">
-                                <Form
-                                    onSubmit={handleSubmit}
-                                    disabledSubmit={selectedModel === null || url === ""}
-                                >
-                                    <input
-                                        type="text"
-                                        placeholder="URL"
-                                        className="border border-gray-400 p-2 w-full rounded mb-1"
-                                        onChange={(event) => setUrl(event.target.value)}
-                                    />
-                                </Form>
-                            </div>
-                        }
-                    />
+        <div>
+            <div className="mx-auto w-1/2 mt-20">
+                <div className="flex flex-row justify-center">
+                    <p className="text-gray-400">Select a model</p>
                 </div>
-            </div>
-            <br />
-            <div className="flex flex-row justify-center">
-                <p className="text-gray-400">The result is displayed here</p>
-            </div>
-            <div className="flex justify-center">
-                <div className="w-2/3">{renderAlert()}</div>
+                <div className="flex flex-row justify-center">
+                    {models.map((mod) => (
+                        <ModelCard
+                            key={mod.name}
+                            model={mod}
+                            selectedModel={selectedModel}
+                            setSelectedModel={setSelectedModel}
+                            handleModelInfoOpen={() => {
+                                setModelInfo(mod);
+                                setModelInfoOpen(true);
+                            }}
+                        />
+                    ))}
+                </div>
+                <br />
+                <div className="flex flex-row justify-center">
+                    <p className="text-gray-400">Enter a URL</p>
+                </div>
+                <div className="flex justify-center">
+                    <div className="w-2/3">
+                        <Card
+                            content={
+                                <div className="flex flex-row justify-center w-full">
+                                    <Form
+                                        onSubmit={handleSubmit}
+                                        disabledSubmit={selectedModel === null || url === ""}
+                                    >
+                                        <input
+                                            type="text"
+                                            placeholder="URL"
+                                            className="border border-gray-400 p-2 w-full rounded mb-1"
+                                            onChange={(event) => setUrl(event.target.value)}
+                                        />
+                                    </Form>
+                                </div>
+                            }
+                        />
+                    </div>
+                </div>
+                <br />
+                <div className="flex flex-row justify-center">
+                    <p className="text-gray-400">The result is displayed here</p>
+                </div>
+                <div className="flex justify-center">
+                    <div className="w-2/3">{renderAlert()}</div>
+                </div>
             </div>
             <ModelInfoPopUp
                 isOpen={modelInfoOpen}
