@@ -3,15 +3,33 @@ import Alert from "./components/general/Alert";
 import Card from "./components/general/Card";
 import Form from "./components/general/Form";
 import ModelCard from "./components/ModelCard";
+import ModelInfoPopUp from "./components/ModelInfoPopUp";
+import ResultDetailsPopUp from "./components/ResultDetailsPopUp";
 
 function App() {
     const [models, setModels] = useState([]);
     const [result, setResult] = useState(null);
     const [status, setStatus] = useState("idle");
     const [error, setError] = useState(null);
+    const [modelInfoOpen, setModelInfoOpen] = useState(false);
+    const [modelInfo, setModelInfo] = useState(null);
+    const [resultDetailsOpen, setResultDetailsOpen] = useState(false);
 
     const [selectedModel, setSelectedModel] = useState(null);
     const [url, setUrl] = useState("");
+
+    const info = {
+        ffnn: [
+            { key: "input", text: "Number of input nodes", type: "number" },
+            { key: "activations", text: "Nubmer of hidden layers", type: "list" },
+            { key: "output", text: "Number of output nodes", type: "number" },
+        ],
+        rf: [
+            { key: "nEstimators", text: "Number of estimators", type: "number" },
+            { key: "maxDepth", text: "Maximum depth", type: "number" },
+            { key: "minSamplesSplit", text: "Minimal sample split", type: "number" },
+        ],
+    };
 
     useEffect(() => {
         fetch("http://127.0.0.1:5000/models")
@@ -43,9 +61,23 @@ function App() {
             case "success":
                 const successMessage = generateSuccessMessage();
                 if (result.pred === 1) {
-                    return <Alert color="red" message={successMessage} showDetails />;
+                    return (
+                        <Alert
+                            color="red"
+                            message={successMessage}
+                            showDetails
+                            onDetailsClick={() => setResultDetailsOpen(true)}
+                        />
+                    );
                 }
-                return <Alert color="green" message={successMessage} showDetails />;
+                return (
+                    <Alert
+                        color="green"
+                        message={successMessage}
+                        showDetails
+                        onDetailsClick={() => setResultDetailsOpen(true)}
+                    />
+                );
             default:
                 return null;
         }
@@ -86,6 +118,10 @@ function App() {
                         model={mod}
                         selectedModel={selectedModel}
                         setSelectedModel={setSelectedModel}
+                        handleModelInfoOpen={() => {
+                            setModelInfo(mod);
+                            setModelInfoOpen(true);
+                        }}
                     />
                 ))}
             </div>
@@ -121,6 +157,20 @@ function App() {
             <div className="flex justify-center">
                 <div className="w-2/3">{renderAlert()}</div>
             </div>
+            <ModelInfoPopUp
+                isOpen={modelInfoOpen}
+                onClose={() => setModelInfoOpen(false)}
+                model={modelInfo}
+                infoStructure={info[modelInfo?.name]}
+            />
+            <ResultDetailsPopUp
+                isOpen={resultDetailsOpen}
+                onClose={() => setResultDetailsOpen(false)}
+                prediction={result?.pred === 1 ? "phishing" : "legitimate"}
+                features={result?.features}
+                confidence={result?.conf}
+                usedModel={result?.model}
+            />
         </div>
     );
 }

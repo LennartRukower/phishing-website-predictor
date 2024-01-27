@@ -10,7 +10,7 @@ import json
 
 app = Flask(__name__)
 
-# add CORS support
+# Adds CORS support
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
@@ -21,6 +21,7 @@ models = [
     {
         "name": "ffnn",
         "description": "Use a Feed Forward Neural Network to classify the url",
+        "info": None,
         "stats": {
             "accuracy": None,
             "precision": None,
@@ -31,6 +32,7 @@ models = [
     {
         "name": "rf",
         "description": "Use a Random Forest to classify the url",
+        "info": None,
         "stats": {
             "accuracy": None,
             "precision": None,
@@ -57,6 +59,7 @@ def get_models():
             model["stats"]["precision"] = round(info["precision"], 2)
             model["stats"]["recall"] = round(info["recall"], 2)
             model["stats"]["f1"] = round(info["f1"], 2)
+        model["info"] = config[model["name"]]["model_config"]
         
     return jsonify(models), 200
 
@@ -101,6 +104,7 @@ def predict_url():
         features = preprocessor.create_encoded_features(features=extracted_features)
 
         pred = None
+        conf = None
 
         if model == "ffnn":
             provider = FFNetProvider(f"{model_folder_path}/model.pt", len(model_features), config[model]["model_config"])
@@ -108,18 +112,18 @@ def predict_url():
             provider.load()
 
             # Predict
-            pred = provider.predict(features)
+            pred, conf = provider.predict(features)
         if model == "rf":
             provider = RFProvider(f"{model_folder_path}/model.pkl", config[model]["model_config"])
             # Load the model
             provider.load()
 
             # Predict
-            pred = provider.predict(features)
+            pred, conf = provider.predict(features)
 
-        result = {"url": url, "model": model, "pred": pred}
+        result = {"url": url, "features": extracted_features, "model": model, "pred": pred, "conf": conf}
         if debug == "true":
-            result = {"url": url, "model": model, "html": html, "ex_fet": extracted_features, "pred": pred}
+            result = {"url": url, "model": model, "html": html, "features": extracted_features, "pred": pred, "conf": conf}
         return jsonify(result), 200
 
     except Exception as e:

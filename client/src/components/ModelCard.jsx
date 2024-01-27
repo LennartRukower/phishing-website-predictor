@@ -1,17 +1,7 @@
+import { mapModelName } from "../utils/mapperUtils";
 import Card from "./general/Card";
 
-function ModelCard({ model, selectedModel, setSelectedModel }) {
-    function generateModelName(model) {
-        switch (model) {
-            case "rf":
-                return "Random Forest";
-            case "ffnn":
-                return "Feed Forward Neural Network";
-            default:
-                return "Unknown";
-        }
-    }
-
+function ModelCard({ model, selectedModel, setSelectedModel, handleModelInfoOpen }) {
     function getStatItem(stat, value) {
         if (value === null) {
             return null;
@@ -26,7 +16,7 @@ function ModelCard({ model, selectedModel, setSelectedModel }) {
     return (
         <div className="w-1/4 m-1">
             <Card
-                title={generateModelName(model.name)}
+                title={mapModelName(model.name)}
                 content={
                     <div>
                         <hr className="my-2" />
@@ -45,6 +35,9 @@ function ModelCard({ model, selectedModel, setSelectedModel }) {
                 isSelected={model.name === selectedModel}
                 onClick={(event) => {
                     setSelectedModel(model.name);
+                }}
+                onButtonClick={() => {
+                    handleModelInfoOpen();
                 }}
             />
         </div>

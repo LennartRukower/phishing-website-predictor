@@ -1,6 +1,6 @@
 import React from "react";
 
-function Alert({ color, message, showDetails }) {
+function Alert({ color, message, showDetails, onDetailsClick }) {
     function getColor(color) {
         switch (color) {
             case "red":
@@ -39,6 +39,7 @@ function Alert({ color, message, showDetails }) {
                 <button
                     className={`${getButtonColor()} text-white font-bold py-2 px-4 rounded`}
                     type="button"
+                    onClick={onDetailsClick}
                 >
                     Details
                 </button>

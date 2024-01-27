@@ -1,6 +1,6 @@
 import React from "react";
 
-function Card({ title, content, clickable, isSelected, onClick }) {
+function Card({ title, content, clickable, isSelected, onClick, onButtonClick }) {
     function getStyle() {
         if (clickable) {
             if (isSelected) {
@@ -13,7 +13,7 @@ function Card({ title, content, clickable, isSelected, onClick }) {
 
     function handleButtonClick(event) {
         event.stopPropagation(); // Stop event propagation
-        console.log(`Clicked ${title}`);
+        onButtonClick();
     }
 
     return (
