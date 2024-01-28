@@ -5,7 +5,6 @@ import Form from "./components/general/Form";
 import ModelCard from "./components/ModelCard";
 import ModelInfoPopUp from "./components/ModelInfoPopUp";
 import ResultDetailsPopUp from "./components/ResultDetailsPopUp";
-import ParallelCoordinatesChart from "./components/general/ParallelCoordinates";
 
 function App() {
     const [models, setModels] = useState([]);
@@ -37,7 +36,20 @@ function App() {
             .then((res) => res.json())
             .then((data) => {
                 if (data.error) throw Error(data.error);
-                setModels(data);
+                setModels([
+                    ...data,
+                    {
+                        description: "Use a Support Vector Machine to classify the url",
+                        info: {},
+                        name: "svm",
+                        stats: {
+                            accuracy: 0.95,
+                            f1: 0.94,
+                            precision: 0.95,
+                            recall: 0.93,
+                        },
+                    },
+                ]);
             })
             .catch((err) => console.log(err));
     }, []);
@@ -173,6 +185,7 @@ function App() {
                 features={result?.features}
                 confidence={result?.conf}
                 usedModel={result?.model}
+                trainingData={result?.trainingData}
             />
         </div>
     );

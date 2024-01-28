@@ -120,10 +120,14 @@ def predict_url():
 
             # Predict
             pred, conf = provider.predict(features)
-
-        result = {"url": url, "features": extracted_features, "model": model, "pred": pred, "conf": conf}
+        
+        # Load training_data.json
+        with open(f"exp/training_data.json", "r") as file:
+            training_data = json.load(file)
+        
+        result = {"url": url, "features": extracted_features, "model": model, "pred": pred, "conf": conf, "trainingData": training_data}
         if debug == "true":
-            result = {"url": url, "model": model, "html": html, "features": extracted_features, "pred": pred, "conf": conf}
+            result = {"url": url, "model": model, "html": html, "features": extracted_features, "pred": pred, "conf": conf, "trainingData": training_data}
         return jsonify(result), 200
 
     except Exception as e:
