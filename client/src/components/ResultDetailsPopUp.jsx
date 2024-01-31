@@ -31,11 +31,25 @@ function ResultDetailsPopUp({
                 The {mapModelName(usedModel)} model is <strong>{toPercents(confidence)}</strong>{" "}
                 confident that the provided url belongs to a <strong>{prediction}</strong> website.
             </p>
+            <br />
+            <hr className="border-1 border-gray-400" />
+            <br />
+            <p>
+                The following chart shows the training data (10% of data labeled legitimate & 10% of
+                data labeled phishing) used to train the {mapModelName(usedModel)} model. The green
+                line represents the features of the provided url.
+            </p>
+            <ParallelCoordinatesChart
+                trainingData={trainingData}
+                currentData={{ ...features, label: prediction }}
+            />
+            <br />
+            <hr className="border-1 border-gray-400" />
+            <br />
             <p>
                 The following information was extracted from the url and the html code of the
                 website:
             </p>
-            <br />
             <div className="w-full flex justify-center ">
                 <div className="w-1/2">
                     {Object.entries(features).map(([key, value]) => (
@@ -47,15 +61,6 @@ function ResultDetailsPopUp({
                 </div>
             </div>
             <br />
-            <p>
-                The following chart shows the training data (10% of data labeled legitimate & 10% of
-                data labeled phishing) used to train the {mapModelName(usedModel)} model. The green
-                line represents the features of the provided url.
-            </p>
-            <ParallelCoordinatesChart
-                trainingData={trainingData}
-                currentData={{ ...features, label: prediction }}
-            />
         </PopUp>
     ) : null;
 }
