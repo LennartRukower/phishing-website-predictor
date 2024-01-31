@@ -58,8 +58,10 @@ class FFNet(nn.Module):
         output = self.forward(features)
         pred = torch.round(output.squeeze(1))
         pred = pred.item()
-        print("OUTPUT", pred)
-        return pred
+
+        conf = 1 - output.item() if pred == 0 else output.item()
+        conf = round(conf, 8)
+        return pred, conf
     
     def load(self, model_path):
         self.load_state_dict(torch.load(model_path))

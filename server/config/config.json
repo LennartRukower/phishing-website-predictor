@@ -1,6 +1,6 @@
 {
     "rf": {
-        "model_version": "2024-01-18",
+        "model_version": "2024-01-25",
         "model_features": [
             "NumDots",
             "SubdomainLevel",
@@ -39,7 +39,7 @@
         "training_config": {}
     },
     "ffnn": {
-        "model_version": "2024-01-15",
+        "model_version": "2024-01-25",
         "model_features": [
             "NumDots",
             "SubdomainLevel",
