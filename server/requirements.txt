@@ -5,6 +5,5 @@ pandas # used for data manipulation
 scikit-learn # used for data manipulation & training
 matplotlib # used for data visualization
 seaborn # used for data visualization
-urllib.parse # used for url parsing
 beautifulsoup4 # used for html parsing
 tldextract # used for url parsing
