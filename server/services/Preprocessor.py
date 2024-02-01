@@ -23,6 +23,8 @@ class Preprocessor:
             return self.create_encoded_features_FFNet(features)
         elif self.model_type == 'rf':
             return self.create_encoded_features_RF(features)
+        elif self.model_type == 'svm':
+            return self.create_encoded_features_SVM(features)
         else:
             raise Exception('Model type not supported')
     
@@ -56,6 +58,10 @@ class Preprocessor:
         df = self.scale_features(df)
 
         return df
+    
+    def create_encoded_features_SVM(self, features):
+        # TODO: @Pavel: Implement this (use the same encoding and scaling as in trainer.py of your model)
+        pass
     
     def scale_features(self, df):
         # Scale the features

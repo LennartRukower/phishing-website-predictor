@@ -6,6 +6,7 @@ from services.Preprocessor import Preprocessor
 from services.Extractor import Extractor
 from config.ConfigLoader import ConfigLoader
 from models.RFProvider import RFProvider
+from models.SVMProvider import SVMProvider
 import json
 from statistics import mode 
 
@@ -18,7 +19,7 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', '*')
     return response
 
-models = [
+available_models = [
     {
         "name": "ffnn",
         "description": "Use a Feed Forward Neural Network to classify the url",
@@ -39,7 +40,8 @@ models = [
             "precision": None,
             "recall": None,
             "f1": None,
-        }
+        },
+    # TODO: @Pavel: Add SVM model object here
     }]
 
 @app.route("/models")
@@ -49,7 +51,7 @@ def get_models():
     config_loader.load()
     config = config_loader.get_config()
 
-    for model in models:
+    for model in available_models:
         model_version = config[model["name"]]["model_version"]
         model_folder_path = f'exp/models/{model["name"]}/{model_version}'
         # Load stats from info file
@@ -62,7 +64,7 @@ def get_models():
             model["stats"]["f1"] = round(info["f1"], 2)
         model["info"] = config[model["name"]]["model_config"]
         
-    return jsonify(models), 200
+    return jsonify(available_models), 200
 
 @app.route("/voting", methods=["GET"])
 def get_voting_methods():
@@ -88,8 +90,8 @@ def predict():
         # Get the url and modesl from the request body
         url = request.json.get("url")
         models = request.json.get("models")
-        debug = request.args.get("debug")
         voting_method = request.json.get("votingMethod")
+        debug = request.args.get("debug")
 
         # Check if the url and models are valid
         if url is None:
@@ -99,8 +101,11 @@ def predict():
             models = ["ffnn"]
         if not isinstance(models, list):
             return jsonify({"error": "Models must be a list"}), 400
+        
+        # Get list of model names from available_models
+        available_model_names = [model["name"] for model in available_models]
         for model in models:
-            if model not in ["ffnn", "rf"]:
+            if model not in available_model_names:
                 return jsonify({"error": "Model not found"}), 400
 
         # Crawl the html code    
@@ -136,6 +141,9 @@ def predict():
                 provider = FFNetProvider(f"{model_folder_path}/model.pt", len(model_features), config[model]["model_config"])
             if model == "rf":
                 provider = RFProvider(f"{model_folder_path}/model.pkl", config[model]["model_config"])
+            if model == "svm":
+                provider = SVMProvider(f"{model_folder_path}/model.pkl", config[model]["model_config"])
+                
             # Load the model
             provider.load()
             # Predict
