@@ -38,6 +38,8 @@
         },
         "training_config": {}
     },
+    // TODO: @Pavel: Add your model config here and delete this comment (json does not support comments)
+    // Use model_version, model_features, model_config, training_config as keys for your model config
     "ffnn": {
         "model_version": "2024-01-25",
         "model_features": [
