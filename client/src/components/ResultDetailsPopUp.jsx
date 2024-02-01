@@ -38,15 +38,15 @@ function ResultDetailsPopUp({
     return prediction && features ? (
         <PopUp isOpen={isOpen} onClose={onClose}>
             <h1 className="text-2xl font-bold mb-4">This website is a {prediction} website!</h1>
-            <p className="text-lg">
+            <ul className="list-disc list-inside">
                 {modelResults.map((res, index) => (
-                    <p key={res.model}>
+                    <li key={res.model}>
                         The {mapModelName(res.model)} model is{" "}
                         <strong>{toPercents(res.conf)}</strong> confident that this website is a{" "}
                         <strong>{res.pred === 1 ? "phishing" : "legitimate"}</strong> website.
-                    </p>
+                    </li>
                 ))}
-            </p>
+            </ul>
             <br />
             <hr className="border-1 border-gray-400" />
             <br />
