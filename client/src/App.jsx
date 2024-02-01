@@ -39,20 +39,7 @@ function App() {
             .then((res) => res.json())
             .then((data) => {
                 if (data.error) throw Error(data.error);
-                setModels([
-                    ...data,
-                    {
-                        description: "Use a Support Vector Machine to classify the url",
-                        info: {},
-                        name: "svm",
-                        stats: {
-                            accuracy: 0.95,
-                            f1: 0.94,
-                            precision: 0.95,
-                            recall: 0.93,
-                        },
-                    },
-                ]);
+                setModels(data);
             })
             .catch((err) => console.log(err));
     }, []);
