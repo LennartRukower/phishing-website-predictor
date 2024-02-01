@@ -6,19 +6,62 @@ from services.Preprocessor import Preprocessor
 from services.Extractor import Extractor
 from config.ConfigLoader import ConfigLoader
 from models.RFProvider import RFProvider
+import json
 
 app = Flask(__name__)
 
-# add CORS support
+# Adds CORS support
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', '*')
     return response
 
+models = [
+    {
+        "name": "ffnn",
+        "description": "Use a Feed Forward Neural Network to classify the url",
+        "info": None,
+        "stats": {
+            "accuracy": None,
+            "precision": None,
+            "recall": None,
+            "f1": None,
+        }
+    },
+    {
+        "name": "rf",
+        "description": "Use a Random Forest to classify the url",
+        "info": None,
+        "stats": {
+            "accuracy": None,
+            "precision": None,
+            "recall": None,
+            "f1": None,
+        }
+    }]
+
 @app.route("/models")
 def get_models():
-    return jsonify(["ffnn", "rf"])
+    # Load model version from config
+    config_loader = ConfigLoader("config/config.json")
+    config_loader.load()
+    config = config_loader.get_config()
+
+    for model in models:
+        model_version = config[model["name"]]["model_version"]
+        model_folder_path = f'exp/models/{model["name"]}/{model_version}'
+        # Load stats from info file
+        with open(f"{model_folder_path}/info.json", "r") as file:
+            info = json.load(file)
+            # Round stats to 2 decimals
+            model["stats"]["accuracy"] = round(info["accuracy"], 2)
+            model["stats"]["precision"] = round(info["precision"], 2)
+            model["stats"]["recall"] = round(info["recall"], 2)
+            model["stats"]["f1"] = round(info["f1"], 2)
+        model["info"] = config[model["name"]]["model_config"]
+        
+    return jsonify(models), 200
 
 @app.route("/predict", methods=["POST"])
 def predict_url():
@@ -61,6 +104,7 @@ def predict_url():
         features = preprocessor.create_encoded_features(features=extracted_features)
 
         pred = None
+        conf = None
 
         if model == "ffnn":
             provider = FFNetProvider(f"{model_folder_path}/model.pt", len(model_features), config[model]["model_config"])
@@ -68,18 +112,22 @@ def predict_url():
             provider.load()
 
             # Predict
-            pred = provider.predict(features)
+            pred, conf = provider.predict(features)
         if model == "rf":
             provider = RFProvider(f"{model_folder_path}/model.pkl", config[model]["model_config"])
             # Load the model
             provider.load()
 
             # Predict
-            pred = provider.predict(features)
-
-        result = {"url": url, "model": model, "pred": pred}
+            pred, conf = provider.predict(features)
+        
+        # Load training_data.json
+        with open(f"exp/training_data.json", "r") as file:
+            training_data = json.load(file)
+        
+        result = {"url": url, "features": extracted_features, "model": model, "pred": pred, "conf": conf, "trainingData": training_data}
         if debug == "true":
-            result = {"url": url, "model": model, "html": html, "ex_fet": extracted_features, "pred": pred}
+            result = {"url": url, "model": model, "html": html, "features": extracted_features, "pred": pred, "conf": conf, "trainingData": training_data}
         return jsonify(result), 200
 
     except Exception as e:

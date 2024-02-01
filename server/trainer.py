@@ -7,6 +7,21 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder
 import json
 
+def create_info_file(model, model_version, model_config, training_config, accuracy, precision, recall, f1):
+    # Create a json file with the model info
+    info = {
+        "model": model,
+        "model_version": model_version,
+        "model_config": model_config,
+        "training_config": training_config,
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1
+    }
+    with open(f"./exp/models/{model}/{model_version}/info.json", "w") as file:
+        json.dump(info, file, indent=4)
+
 def train_rf():
     from sklearn.ensemble import RandomForestClassifier   
 
@@ -84,13 +99,7 @@ def train_rf():
     os.mkdir(folder_path)
 
     # Save specific training config and results to file
-    with open(os.path.join(folder_path, "info.txt"), "w") as file:
-        file.write(f"Number of trees: {rf.n_estimators}\n")
-        file.write(f"Max depth: {rf.max_depth}\n")
-        file.write(f"Training accuracy: {accuracy}\n")
-        file.write(f"Precision: {precision}\n")
-        file.write(f"Recall: {recall}\n")
-        file.write(f"F1: {f1}\n")
+    create_info_file("rf", model_version, model_config, training_config, accuracy, precision, recall, f1)
     
     # Update model version in config
     config["rf"]["model_version"] = model_version
@@ -206,19 +215,8 @@ def train_ffnn():
 
     os.mkdir(folder_path)
 
-
     # Save specific training config and results to file
-    with open(os.path.join(folder_path, "info.txt"), "w") as file:
-        file.write(f"Number of hidden layers: {len(hidden_sizes)}\n")
-        file.write(f"Batch size: {batch_size}\n")
-        file.write(f"Number of epochs: {epochs}\n")
-        file.write(f"Loss function: {criterion.__class__.__name__}\n")
-        file.write(f"Learning rate: {lr}\n")
-        file.write(f"Training loss: {losses[-1]}\n")
-        file.write(f"Accuracy: {accuracy}\n")
-        file.write(f"Precision: {precision}\n")
-        file.write(f"Recall: {recall}\n")
-        file.write(f"F1: {f1}\n")
+    create_info_file("ffnn", model_version, model_config, training_config, accuracy, precision, recall, f1)
 
     # Update model version in config
     config["ffnn"]["model_version"] = model_version

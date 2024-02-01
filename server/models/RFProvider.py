@@ -18,5 +18,7 @@ class RFProvider():
         self.model = pickle.load(open(self.model_path, 'rb'))
     
     def predict(self, features):
-        print(self.model.predict(features)[0])
-        return float(self.model.predict(features)[0])
+        pred = self.model.predict(features)[0]
+        class_probabilities = self.model.predict_proba(features)
+        conf = class_probabilities[0][pred]
+        return float(pred), conf

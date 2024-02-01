@@ -13,3 +13,12 @@ This application provides a simple web interface to predict if a given url belon
 - Navigate into the server folder: `cd server`
 - Install the dependencies: `pip install -r requirements.txt`
 - Start the REST api: `python main.py`
+
+
+# API documentation
+
+## /models
+### Summary
+Returns the available models.
+### Returns
+
