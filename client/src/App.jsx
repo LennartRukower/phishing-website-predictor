@@ -15,7 +15,10 @@ function App() {
     const [modelInfo, setModelInfo] = useState(null);
     const [resultDetailsOpen, setResultDetailsOpen] = useState(false);
 
-    const [selectedModel, setSelectedModel] = useState(null);
+    const [votingMethods, setVotingMethods] = useState([]);
+    const [selectedVotingMethod, setSelectedVotingMethod] = useState(null);
+
+    const [selectedModels, setSelectedModels] = useState([]);
     const [url, setUrl] = useState("");
 
     const info = {
@@ -53,6 +56,25 @@ function App() {
             })
             .catch((err) => console.log(err));
     }, []);
+
+    useEffect(() => {
+        fetch("http://127.0.0.1:5000/voting")
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.error) throw Error(data.error);
+                setVotingMethods(data);
+                setSelectedVotingMethod(data[0].name);
+            })
+            .catch((err) => console.log(err));
+    }, []);
+
+    function selectModel(modelName) {
+        if (selectedModels.includes(modelName)) {
+            setSelectedModels(selectedModels.filter((mod) => mod !== modelName));
+        } else {
+            setSelectedModels([...selectedModels, modelName]);
+        }
+    }
 
     function generateSuccessMessage() {
         const prediction = result.pred === 1 ? "phishing" : "legitimate";
@@ -104,7 +126,8 @@ function App() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 url: url,
-                model: selectedModel,
+                models: selectedModels,
+                votingMethods: selectedModels.length > 1 ? selectedVotingMethod : undefined,
             }),
         })
             .then((res) => res.json())
@@ -123,15 +146,15 @@ function App() {
         <div>
             <div className="mx-auto w-1/2 mt-20">
                 <div className="flex flex-row justify-center">
-                    <p className="text-gray-400">Select a model</p>
+                    <p className="text-gray-400">Select one or more models</p>
                 </div>
                 <div className="flex flex-row justify-center">
                     {models.map((mod) => (
                         <ModelCard
                             key={mod.name}
                             model={mod}
-                            selectedModel={selectedModel}
-                            setSelectedModel={setSelectedModel}
+                            selectedModels={selectedModels}
+                            selectModel={selectModel}
                             handleModelInfoOpen={() => {
                                 setModelInfo(mod);
                                 setModelInfoOpen(true);
@@ -139,6 +162,49 @@ function App() {
                         />
                     ))}
                 </div>
+                {selectedModels.length > 1 ? (
+                    <div>
+                        <br />
+                        <div className="flex flex-row justify-center">
+                            <p className="text-gray-400">Choose a voting method</p>
+                        </div>
+                        <div className="flex justify-center">
+                            <div className="w-2/3">
+                                <Card
+                                    content={
+                                        <div className="flex flex-row justify-center w-full">
+                                            <Form withoutButton>
+                                                <select
+                                                    className="border border-gray-400 bg-white p-2 w-full rounded mb-1"
+                                                    onChange={(event) =>
+                                                        setSelectedVotingMethod(event.target.value)
+                                                    }
+                                                >
+                                                    {votingMethods.map((method) => (
+                                                        <option
+                                                            key={method.name}
+                                                            value={method.name}
+                                                        >
+                                                            {method.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <p className="text-gray-400">
+                                                    {
+                                                        votingMethods.find(
+                                                            (method) =>
+                                                                method.name === selectedVotingMethod
+                                                        )?.description
+                                                    }
+                                                </p>
+                                            </Form>
+                                        </div>
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
                 <br />
                 <div className="flex flex-row justify-center">
                     <p className="text-gray-400">Enter a URL</p>
@@ -150,7 +216,7 @@ function App() {
                                 <div className="flex flex-row justify-center w-full">
                                     <Form
                                         onSubmit={handleSubmit}
-                                        disabledSubmit={selectedModel === null || url === ""}
+                                        disabledSubmit={selectedModels === null || url === ""}
                                     >
                                         <input
                                             type="text"
@@ -183,8 +249,8 @@ function App() {
                 onClose={() => setResultDetailsOpen(false)}
                 prediction={result?.pred === 1 ? "phishing" : "legitimate"}
                 features={result?.features}
-                confidence={result?.conf}
-                usedModel={result?.model}
+                modelResults={result?.results}
+                usedModels={result?.results.map((res) => res.model)}
                 trainingData={result?.trainingData}
             />
         </div>

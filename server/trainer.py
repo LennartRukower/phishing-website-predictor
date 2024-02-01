@@ -3,9 +3,21 @@ import numpy as np
 from config.ConfigLoader import ConfigLoader
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier   
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder
 import json
+import datetime
+import pickle
+from torch.utils.data import TensorDataset
+import os
+import torch
+from exp.FFNet import FFNet
+from exp.Trainer import Trainer
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def create_info_file(model, model_version, model_config, training_config, accuracy, precision, recall, f1):
     # Create a json file with the model info
@@ -22,9 +34,39 @@ def create_info_file(model, model_version, model_config, training_config, accura
     with open(f"./exp/models/{model}/{model_version}/info.json", "w") as file:
         json.dump(info, file, indent=4)
 
-def train_rf():
-    from sklearn.ensemble import RandomForestClassifier   
+def create_model_folder(model):
+    # Create new folder for the model
+    now = datetime.datetime.now()
+    model_version = now.strftime("%Y-%m-%d")
+    folder_path = os.path.join(f"./exp/models/{model}", model_version)
+    # Check if the folder (and therefore the version) already exists
+    if os.path.exists(folder_path):
+        # Append a number to the model version
+        i = 1
+        while os.path.exists(os.path.join(folder_path + f"_{i}")):
+            i += 1
+        model_version = model_version + f"_{i}"
+        folder_path = os.path.join(f"./exp/models/{model}", model_version)
 
+    os.mkdir(folder_path)
+    return folder_path, model_version
+
+def train_svm():
+    # TODO: @Pavel:
+    # - Read data from csv file
+    # - Load config
+    # - Split data into features and targets
+    # - Create training, test and validation data
+    # - Encode labels
+    # - Scale the features
+    # - Init model
+    # - Train model
+    # - Evaluate model
+    # - Save model
+    pass
+
+def train_rf():
+    
     # Read data from csv file
     df = pd.read_csv(filepath_or_buffer="./exp/dataset.csv", sep=";")
     # Load config
@@ -32,7 +74,6 @@ def train_rf():
     config_loader.load()
     config = config_loader.get_config()
 
-    # TODO: Use config
     model_features = config["rf"]["model_features"]
     model_config = config["rf"]["model_config"]
     training_config = config["rf"]["training_config"]
@@ -73,30 +114,12 @@ def train_rf():
     f1 = f1_score(y_val, y_pred)
 
     # Plot confusion matrix
-    from sklearn.metrics import confusion_matrix
-    import matplotlib.pyplot as plt
-    import seaborn as sns
     cm = confusion_matrix(y_val, y_pred)
     sns.heatmap(cm, annot=True, fmt='g')
     plt.show()
 
     # >>>>>> SAVE MODEL
-    import os
-    import datetime
-    import pickle
-    now = datetime.datetime.now()
-    model_version = now.strftime("%Y-%m-%d")
-    folder_path = os.path.join("./exp/models/rf", model_version)
-    # Check if the folder (and therefore the version) already exists
-    if os.path.exists(folder_path):
-        # Append a number to the model version
-        i = 1
-        while os.path.exists(os.path.join(folder_path + f"_{i}")):
-            i += 1
-        model_version = model_version + f"_{i}"
-        folder_path = os.path.join("./exp/models/rf", model_version)
-
-    os.mkdir(folder_path)
+    folder_path, model_version = create_model_folder("rf")
 
     # Save specific training config and results to file
     create_info_file("rf", model_version, model_config, training_config, accuracy, precision, recall, f1)
@@ -118,14 +141,6 @@ def train_rf():
 
 def train_ffnn():
     # >>>>>> PREPARE DATA
-    import os
-    import datetime
-    import torch
-    import pickle
-    from exp.FFNet import FFNet
-    from exp.Trainer import Trainer
-    import matplotlib.pyplot as plt
-
     # Read data from csv file
     df = pd.read_csv(filepath_or_buffer="./exp/dataset.csv", sep=";")
 
@@ -157,8 +172,6 @@ def train_ffnn():
     X_train = scaler.fit_transform(X_train)
     X_val = scaler.transform(X_val)
 
-    from torch.utils.data import TensorDataset
-
     # Convert to tensors
     X_train, y_train = torch.tensor(X_train, dtype=torch.float32), torch.tensor(y_train, dtype=torch.long)
     X_val, y_val = torch.tensor(X_val, dtype=torch.float32), torch.tensor(y_val, dtype=torch.long)
@@ -173,9 +186,6 @@ def train_ffnn():
     output_size = model_config['output']
     activations = model_config["activations"]
     net = FFNet(input_size, hidden_sizes, output_size, activations)
-
-    # Print model summary
-    print(net)
 
     # >>>>>> TRAIN MODEL
     criterion = None
@@ -200,20 +210,8 @@ def train_ffnn():
 
     accuracy, precision, recall, f1 = trainer.evaluate()
 
-    # Create new folder for the model
-    now = datetime.datetime.now()
-    model_version = now.strftime("%Y-%m-%d")
-    folder_path = os.path.join("./exp/models/ffnn", model_version)
-    # Check if the folder (and therefore the version) already exists
-    if os.path.exists(folder_path):
-        # Append a number to the model version
-        i = 1
-        while os.path.exists(os.path.join(folder_path + f"_{i}")):
-            i += 1
-        model_version = model_version + f"_{i}"
-        folder_path = os.path.join("./exp/models/ffnn", model_version)
-
-    os.mkdir(folder_path)
+    # >>>>>> SAVE MODEL
+    folder_path, model_version = create_model_folder("ffnn")
 
     # Save specific training config and results to file
     create_info_file("ffnn", model_version, model_config, training_config, accuracy, precision, recall, f1)
@@ -240,6 +238,9 @@ if __name__ == "__main__":
         train_ffnn()
     elif type == "rf":
         train_rf()
+    elif type == "svm":
+        # TODO: @Pavel implement train_svm()
+        pass
     else:
         print("Invalid model type")
 

@@ -1,7 +1,7 @@
 import { mapModelName } from "../utils/mapperUtils";
 import Card from "./general/Card";
 
-function ModelCard({ model, selectedModel, setSelectedModel, handleModelInfoOpen }) {
+function ModelCard({ model, selectedModels, selectModel, handleModelInfoOpen }) {
     function getStatItem(stat, value) {
         if (value === null) {
             return null;
@@ -32,9 +32,9 @@ function ModelCard({ model, selectedModel, setSelectedModel, handleModelInfoOpen
                     </div>
                 }
                 clickable
-                isSelected={model.name === selectedModel}
+                isSelected={selectedModels.includes(model.name)}
                 onClick={(event) => {
-                    setSelectedModel(model.name);
+                    selectModel(model.name);
                 }}
                 onButtonClick={() => {
                     handleModelInfoOpen();
