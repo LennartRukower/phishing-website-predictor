@@ -120,9 +120,14 @@ def predict():
 
         # Crawl the html code    
         cralwer = WebCrawler()
-        html = cralwer.crawl(url)
+        html, crawled_url = cralwer.crawl(url)
         if html.startswith("Error"):
             return jsonify({"error": html}), 400
+        # If the crawled url is different from the requested url, the url was possibly shortened
+        if url != crawled_url:
+            url = crawled_url
+
+        # Extract features
         extractor = Extractor()
         extracted_features = extractor.extract_features(url, html)
 
