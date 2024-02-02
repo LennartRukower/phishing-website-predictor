@@ -1,0 +1,14 @@
+{
+    "model": "rf",
+    "model_version": "2024-02-02",
+    "model_config": {
+        "nEstimators": 100,
+        "maxDepth": -1,
+        "minSamplesSplit": 2
+    },
+    "training_config": {},
+    "accuracy": 0.937,
+    "precision": 0.9281437125748503,
+    "recall": 0.9451219512195121,
+    "f1": 0.9365558912386707
+}

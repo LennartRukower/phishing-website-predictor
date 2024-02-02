@@ -53,6 +53,10 @@ def create_model_folder(model):
     os.mkdir(folder_path)
     return folder_path, model_version
 
+def save_confusion_matrix(cm, folder_path):
+    sns.heatmap(cm, annot=True, fmt='g')
+    plt.savefig(os.path.join(folder_path, "confusion_matrix.png"))
+
 def train_svm():
     # Read data from csv file
     data = pd.read_csv(filepath_or_buffer="./exp/dataset.csv", sep=";")
@@ -113,6 +117,11 @@ def train_svm():
     
     sns.heatmap(conf_matrix, annot=True, fmt='g')
     plt.show()
+
+    # Plot confusion matrix
+    cm = confusion_matrix(y_test, y_pred)
+    sns.heatmap(cm, annot=True, fmt='g')
+    plt.show()
     
     # Save model
     folder_path, model_version = create_model_folder("svm")
@@ -120,6 +129,9 @@ def train_svm():
     # Save specific training config and results to file
     create_info_file("svm", model_version, model_config, training_config, accuracy, precision, recall, f1)
     
+    # Save confusion matrix to file
+    save_confusion_matrix(conf_matrix, folder_path)
+
     # Update model version in config
     config["svm"]["model_version"] = model_version
 
@@ -190,7 +202,10 @@ def train_rf():
 
     # Save specific training config and results to file
     create_info_file("rf", model_version, model_config, training_config, accuracy, precision, recall, f1)
-    
+
+    # Save confusion matrix to file
+    save_confusion_matrix(cm, folder_path)
+
     # Update model version in config
     config["rf"]["model_version"] = model_version
 
@@ -275,13 +290,16 @@ def train_ffnn():
     plt.plot(losses)
     plt.show()
 
-    accuracy, precision, recall, f1 = trainer.evaluate()
+    accuracy, precision, recall, f1, cm = trainer.evaluate()
 
     # >>>>>> SAVE MODEL
     folder_path, model_version = create_model_folder("ffnn")
 
     # Save specific training config and results to file
     create_info_file("ffnn", model_version, model_config, training_config, accuracy, precision, recall, f1)
+
+    # Save confusion matrix as an image
+    save_confusion_matrix(cm, folder_path)
 
     # Update model version in config
     config["ffnn"]["model_version"] = model_version

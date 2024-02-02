@@ -96,5 +96,5 @@ class Trainer():
             print(f'Validation Precision: {precision}')
             print(f'Validation Recall: {recall}')
             print(f'Validation F1 Score: {f1}')
-            return accuracy, precision, recall, f1
+            return accuracy, precision, recall, f1, cm
         
