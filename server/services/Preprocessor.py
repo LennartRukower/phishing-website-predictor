@@ -1,7 +1,9 @@
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
-import torch
 import pickle
+
+import pandas as pd
+import torch
+from sklearn.preprocessing import StandardScaler
+
 
 class Preprocessor:
 
@@ -60,9 +62,11 @@ class Preprocessor:
         return df
     
     def create_encoded_features_SVM(self, features):
-        # TODO: @Pavel: Implement this (use the same encoding and scaling as in trainer.py of your model)
-        pass
-    
+        data = pd.DataFrame(features, index=[0])
+        
+        data = self.remove_features(data)
+        data = self.scale_features(data)
+            
     def scale_features(self, df):
         # Scale the features
         df = self.scaler.transform(df)
