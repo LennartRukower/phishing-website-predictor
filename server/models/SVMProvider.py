@@ -23,12 +23,6 @@ class SVMProvider():
         self.model.set_params(C=self.model_config['C'], kernel=self.model_config['kernel'], gamma=self.model_config['gamma'])
     
     def predict(self, features):
-        # Check if features is a scalar or NaN
-        if isinstance(features, (int, float)) or np.isnan(features):
-            features = np.array([[features]])  # Reshape as a 2D array
-        elif isinstance(features, list) and len(features) == 1:
-            features = np.array([features])  # Convert single-element list to 2D array
-        
         pred = self.model.predict(features)
         conf = None
         return float(pred), conf

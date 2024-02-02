@@ -66,6 +66,7 @@ class Preprocessor:
         
         data = self.remove_features(data)
         data = self.scale_features(data)
+        return data
             
     def scale_features(self, df):
         # Scale the features
