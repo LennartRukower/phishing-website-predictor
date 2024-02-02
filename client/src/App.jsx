@@ -203,7 +203,7 @@ function App() {
                                 <div className="flex flex-row justify-center w-full">
                                     <Form
                                         onSubmit={handleSubmit}
-                                        disabledSubmit={selectedModels === null || url === ""}
+                                        disabledSubmit={selectedModels.length === 0 || url === ""}
                                     >
                                         <input
                                             type="text"
