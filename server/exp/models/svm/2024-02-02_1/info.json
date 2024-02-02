@@ -1,0 +1,15 @@
+{
+    "model": "svm",
+    "model_version": "2024-02-02_1",
+    "model_config": {
+        "C": 100,
+        "kernel": "linear",
+        "gamma": "scale",
+        "optimize": "True"
+    },
+    "training_config": {},
+    "accuracy": 0.876,
+    "precision": 0.8446691176470589,
+    "recall": 0.9208416833667334,
+    "f1": 0.8811121764141898
+}

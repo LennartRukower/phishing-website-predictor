@@ -39,7 +39,7 @@
         "training_config": {}
     },
     "svm": {
-        "model_version": "2024-02-02",
+        "model_version": "2024-02-02_1",
         "model_features": [
             "NumDots",
             "SubdomainLevel",

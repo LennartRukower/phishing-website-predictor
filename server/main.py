@@ -1,14 +1,14 @@
-from flask import Flask, jsonify
-from flask import request
-from services.WebCrawler import WebCrawler
-from models.FFNetProvider import FFNetProvider
-from services.Preprocessor import Preprocessor
-from services.Extractor import Extractor
+import json
+from statistics import mode
+
 from config.ConfigLoader import ConfigLoader
+from flask import Flask, jsonify, request
+from models.FFNetProvider import FFNetProvider
 from models.RFProvider import RFProvider
 from models.SVMProvider import SVMProvider
-import json
-from statistics import mode 
+from services.Extractor import Extractor
+from services.Preprocessor import Preprocessor
+from services.WebCrawler import WebCrawler
 
 app = Flask(__name__)
 
@@ -41,7 +41,17 @@ available_models = [
             "recall": None,
             "f1": None,
         },
-    # TODO: @Pavel: Add SVM model object here
+    },
+    {
+        "name": "svm",
+        "description": "Use a Support Vector Machine to classify the url",
+        "info": None,
+        "stats": {
+            "accuracy": None,
+            "precision": None,
+            "recall": None,
+            "f1": None,
+        }
     }]
 
 @app.route("/models")

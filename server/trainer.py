@@ -1,23 +1,25 @@
 # Script for training the models
-import numpy as np
-from config.ConfigLoader import ConfigLoader
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier   
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import LabelEncoder
-import json
 import datetime
-import pickle
-from torch.utils.data import TensorDataset
+import json
 import os
+import pickle
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
 import torch
+from config.ConfigLoader import ConfigLoader
 from exp.FFNet import FFNet
 from exp.Trainer import Trainer
-import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
-import seaborn as sns
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
+                             precision_score, recall_score)
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.svm import SVC
+from torch.utils.data import TensorDataset
+
 
 def create_info_file(model, model_version, model_config, training_config, accuracy, precision, recall, f1):
     # Create a json file with the model info
@@ -52,18 +54,84 @@ def create_model_folder(model):
     return folder_path, model_version
 
 def train_svm():
-    # TODO: @Pavel:
-    # - Read data from csv file
-    # - Load config
-    # - Split data into features and targets
-    # - Create training, test and validation data
-    # - Encode labels
-    # - Scale the features
-    # - Init model
-    # - Train model
-    # - Evaluate model
-    # - Save model
-    pass
+    # Read data from csv file
+    data = pd.read_csv(filepath_or_buffer="./exp/dataset.csv", sep=";")
+    
+    # Load config
+    config_loader = ConfigLoader("./config/config.json")
+    config_loader.load()
+    config = config_loader.get_config()
+
+    model_features = config["svm"]["model_features"]
+    model_config = config["svm"]["model_config"]
+    training_config = config["svm"]["training_config"]
+    
+    # Split data into features and targets
+    X = data[model_features]
+    y = data['CLASS_LABEL']
+    
+    # Create training, test and validation data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=4)
+    
+    # Encode labels
+    
+    
+    # Scale the features
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+    
+    # Init model
+    C = model_config["C"]
+    kernel = model_config["kernel"]
+    gamma = model_config["gamma"]
+    optimize = model_config["optimize"] #if model should choose parameters by itself
+    
+    svm_model = SVC()
+    
+    if optimize == True:
+        param_grid = {'C': [0.1, 1, 10, 100], 'kernel': ['linear', 'poly', 'rbf', 'sigmoid'], 'gamma': ['scale', 'auto']}
+        # Use GridSearchCV for hyperparameter tuning
+        grid_search = GridSearchCV(estimator=svm_model, param_grid=param_grid, cv=5, scoring='accuracy')
+        grid_search.fit(X_train, y_train)
+        params = grid_search.best_params_
+        print("Best Hyperparameters:", params)
+    else:
+        params = {"C": C, "kernel": kernel, "gamma": gamma}
+    
+    # Train model
+    best_svm_model = SVC(**params)
+    best_svm_model.fit(X_train, y_train)
+    y_pred = best_svm_model.predict(X_test)
+    
+    # Evaluate model
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred)
+    conf_matrix = confusion_matrix(y_test, y_pred)
+    
+    sns.heatmap(conf_matrix, annot=True, fmt='g')
+    plt.show()
+    
+    # Save model
+    folder_path, model_version = create_model_folder("svm")
+
+    # Save specific training config and results to file
+    create_info_file("svm", model_version, model_config, training_config, accuracy, precision, recall, f1)
+    
+    # Update model version in config
+    config["svm"]["model_version"] = model_version
+
+    # Save the used config
+    with open(os.path.join(folder_path, "config.json"), "w") as file:
+        json.dump(config, file, indent=4)
+    # Save the scaler
+    with open(os.path.join(folder_path, "scaler.pkl"), "wb") as file:
+        pickle.dump(scaler, file)
+    # Save training results to file
+    with open(os.path.join(folder_path, "model.pkl"), "wb") as file:
+        pickle.dump(best_svm_model, file)
 
 def train_rf():
     
@@ -107,7 +175,6 @@ def train_rf():
     y_pred = rf.predict(X_val)
 
     # >>>>>> EVALUATE MODEL
-    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
     accuracy = accuracy_score(y_val, y_pred)
     precision = precision_score(y_val, y_pred)
     recall = recall_score(y_val, y_pred)
@@ -239,8 +306,7 @@ if __name__ == "__main__":
     elif type == "rf":
         train_rf()
     elif type == "svm":
-        # TODO: @Pavel implement train_svm()
-        pass
+        train_svm()
     else:
         print("Invalid model type")
 
